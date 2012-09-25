@@ -15,6 +15,7 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
 	 url(r'^game/', cacho_app.views.index),
-    url(r'^admin/', include(admin.site.urls)),
+	 url(r'^logout/', cacho_app.views.logout_view),
+	 url(r'^admin/', include(admin.site.urls)),
 	 url(r'^accounts/login/$', 'django.contrib.auth.views.login'),
 )
