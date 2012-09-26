@@ -1,3 +1,21 @@
 *~
 *.pyc
+bin
+eggs
+develop-eggs
+external
+parts
+build
+*.egg
+*.egg-info
+.installed.cfg
+.mr.developer.cfg
 
+logs
+*.log
+*.pid
+
+*.swp
+*.swo
+
+docs
