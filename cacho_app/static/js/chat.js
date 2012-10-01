@@ -1,4 +1,5 @@
 // socket.io specific code
+// funciones de socket del cliente.
 var socket = io.connect("/chat");
 
 socket.on('connect', function () {

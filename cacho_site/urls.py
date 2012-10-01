@@ -1,14 +1,21 @@
+from django.conf import settings
 from django.conf.urls.defaults import patterns, include, url
-import cacho_app.views
-
+from django.contrib import auth
 from django.contrib import admin
 admin.autodiscover()
 
+# urls a vistas de otras apps
 urlpatterns = patterns('',
-	 url(r'^logout/', cacho_app.views.logout_view),
-	 url(r'^admin/', include(admin.site.urls)),
-	 url(r'^accounts/login/$', 'django.contrib.auth.views.login'),
+	url(r'^admin/', include(admin.site.urls)),
+	url(r'^login/$', 'django.contrib.auth.views.login'),
+	url(r'^play/', include("cacho_app.urls")),
+)
 
-	# agregar las urls de la app
-	url(r'play/', include('cacho_app.urls'))
+urlpatterns += patterns('cacho_site.views', 
+	# login logout
+	url(r'^logout/', 'logout_view'),
+
+	# urls de la app.
+	url(r'^hello', 'hello'),
+	url("", 'index'),
 )
