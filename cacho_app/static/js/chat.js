@@ -2,9 +2,13 @@
 // funciones de socket del cliente.
 var socket = io.connect("/chat");
 
-socket.on('connect', function () {
-    $('#chat').addClass('connected');
-    socket.emit('join', window.room); 
+socket.on('connect', function (username) {
+   $('#chat').addClass('connected');
+   socket.emit('join', window.room);
+});
+
+socket.on('session_data', function (data) {
+	alert(data)
 });
 
 socket.on('announcement', function (msg) {

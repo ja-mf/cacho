@@ -18,7 +18,7 @@ MANAGERS = ADMINS
 
 # timezone y local settings
 TIME_ZONE = 'America/Santiago'
-LANGUAGE_CODE = 'es_CL'
+LANGUAGE_CODE = 'es-CL'
 USE_I18N = True
 USE_L10N = True
 

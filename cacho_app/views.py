@@ -3,6 +3,7 @@ from socketio import socketio_manage
 from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 from cacho_app.models import ChatRoom
 from cacho_app.chat_socketio import ChatNamespace
@@ -14,12 +15,13 @@ def rooms(request, template="rooms.html"):
     context = {"rooms": ChatRoom.objects.all()}
     return render(request, template, context)
 
-
+@login_required
 def room(request, slug, template="room.html"):
     """
     Show a room.
     """
-    context = {"room": get_object_or_404(ChatRoom, slug=slug)}
+    logged_user = request.user.get_full_name()
+    context = {"room": get_object_or_404(ChatRoom, slug=slug), "user": logged_user}
     return render(request, template, context)
 
 

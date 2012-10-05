@@ -1,0 +1,31 @@
+\subsection{Objetivos}
+\subsubsection{General}
+El objetivo principal de la aplicacion es ofrecer una plataforma para
+un juego popular chileno, en linea, activo y rapido. La lógica del juego
+es de relativa sencillez y las reglas son ampliamente conocidas, por lo que
+pretende que la jugabilidad sea alta.
+
+\subsubsection{Especificos}
+\begin{itemize}
+	\item Promover el juego de dudo.
+	\item Disponer de un juego rapido e instantaneo
+	\item Utilizar tecnologías que permitan su jugabilidad de forma nativa,
+	no es necesario descargar nada para empezar a jugar.
+	\item Contar con un chat y salas de juego.
+	\item Establecer un protocolo de comunicación entre el cliente y el servidor (definición de mensajes).
+\end{itemize}
+
+\subsection{Tecnologias utilizadas}
+Para la parte del servidor, constará de una aplicacion MVC, utilizando el framework
+Django (Python). Con el fin de tener una comunicación asincronica y activa entre
+el cliente y el servidor, se utilizará un binding de la biblioteca Socket.IO (Javascript),
+construido sobre gevent, una biblioteca basadas en co-rutinas para aplicaciones de red, llamado
+gevent-socketio.\\
+
+En el cliente se utilizará HTML5 y CSS para el diseño, y para la comunicación, Javascript
+con la biblioteca Socket.IO, basada a su vez en node.js.\\
+
+Se posee un repositorio git para el control de versiones, hospedado en github.com
+
+
+
