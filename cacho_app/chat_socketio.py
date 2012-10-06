@@ -8,9 +8,11 @@ from django.http import HttpResponse
 
 
 # este modulo maneja la interaccion de gevent-socketio (parte del servidor)
-# con el javascript del cliente HTML5. estan definidos metodos de un namespace
+# con el javascript del cliente (socket.io). estan definidos metodos de un namespace
 # (ver documentacion de gevent-socketio), las cuales se ejecutaran dependiendo del mensaje 
-
+# para cada peticion, es una instancia de este namespace, se puede acceder al
+# request object naturalmente, como self.request y asi obtener variables de session y
+# de otro interes
 @namespace('/chat')
 class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 	 nicknames = []
@@ -23,7 +25,7 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		  #self.room = room
 		  # prueba de acceso al request object en el namespace.
 		  # faltaria hacer un modelo de datos para cada room,
-# hacer la instancia de la logica de juego, un controlador para room si es que se quiere
+		# hacer la instancia de la logica de juego, un controlador para room si es que se quiere
 		  
 		  user_name = self.request.user.get_full_name()
 		  self.emit('session_data', user_name)
