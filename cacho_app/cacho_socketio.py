@@ -7,8 +7,7 @@ from socketio.sdjango import namespace
 from cacho_app.models import GameUser, GameRoom
 
 from django.http import HttpResponse
-from dudo import DudoGame
-from RingBuffer import RingBuffer
+from Dudo import Dudo, RingBuffer
 
 # este modulo maneja la interaccion de gevent-socketio (parte del servidor)
 # con el javascript del cliente (socket.io). estan definidos metodos de un namespace
@@ -100,13 +99,13 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 				break
 			# enviar turno y jugadas posibles
 			self.emit_to_room(self.room, 'server_message', 'todos confirmaron')
-			self.emit_to_room(self.room, 'turno', self.turnos[self.room].get()
+			self.emit_to_room(self.room, 'turno', self.turnos[self.room].get())
 
 	def on_jugada(self, jugada):
 		# hacer la mecanica para recibir una jugada
 		# pasar turno, si jugada es dudo o calzo, revisar y actualizar la lista de dados del usuario y tirar dados para todos.
 		# comprobar si alguien gano
-#
+		# GAME LOOP
 		pass
 
 	def on_user_message(self, msg):
