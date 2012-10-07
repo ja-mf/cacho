@@ -1,5 +1,7 @@
 from django.db import models
 from django.template.defaultfilters import slugify
+from django.contrib.auth.models import User
+
 
 class GameRoom(models.Model):
 
@@ -21,14 +23,15 @@ class GameRoom(models.Model):
             self.slug = slugify(self.name)
         super(GameRoom, self).save(*args, **kwargs)
 
-#class ChatUser(models.Model):
-#
-#    name = models.CharField(max_length=20)
-#    session = models.CharField(max_length=20)
-#    room = models.ForeignKey("cacho_app.ChatRoom", related_name="users")
-#
-#    class Meta:
-#        ordering = ("name",)
-#
-#    def __unicode__(self):
-#        return self.name
+class GameUser(models.Model):
+
+	user = models.ForeignKey(User)
+	session = models.CharField(max_length=20)
+	room = models.ForeignKey("cacho_app.GameRoom", related_name="users")
+	
+	class Meta:
+	    ordering = ("room",)
+	
+	def __unicode__(self):
+	    return self.user.username
+		

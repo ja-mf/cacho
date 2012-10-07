@@ -6,8 +6,9 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 from cacho_app.models import GameRoom
-from cacho_app.chat_socketio import ChatNamespace
+from cacho_app.cacho_socketio import GameNamespace
 
+@login_required
 def rooms(request, template="rooms.html"):
     """
     Homepage - lists all rooms.
@@ -23,7 +24,6 @@ def room(request, slug, template="room.html"):
     logged_user = request.user.get_full_name()
     context = {"room": get_object_or_404(GameRoom, slug=slug), "user": logged_user}
     return render(request, template, context)
-
 
 def create(request):
     """

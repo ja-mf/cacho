@@ -1,25 +1,25 @@
 // socket.io specific code
 // funciones de socket del cliente.
-var socket = io.connect("/chat");
+var socket = io.connect("/game");
 
 socket.on('connect', function (username) {
    $('#chat').addClass('connected');
    socket.emit('join', window.room);
 });
 
-socket.on('session_data', function (data) {
+socket.on('usuarios_room', function (usernames) {
+    $('#nicknames').empty().append($('<span>Online: </span>'));
+    for (var i in usernames) {
+	  $('#nicknames').append($('<b>').text(usernames[i]));
+    }
+});
+
+socket.on('server_message', function (data) {
 	alert(data)
 });
 
 socket.on('announcement', function (msg) {
     $('#lines').append($('<p>').append($('<em>').text(msg)));
-});
-
-socket.on('nicknames', function (nicknames) {
-    $('#nicknames').empty().append($('<span>Online: </span>'));
-    for (var i in nicknames) {
-	  $('#nicknames').append($('<b>').text(nicknames[i]));
-    }
 });
 
 socket.on('msg_to_room', message);

@@ -28,14 +28,15 @@ class DudoGame:
 	# inicio del juego, primer turno aleatorio
 	# establecer numero de dados en la mesa.
 	# construir Player para cada jugador y agregarlo a players[]
-	def __init__(self, players):
+	def __init__(self):
+		
 		# agregar los jugadores al juego
-		for p in players:
-			self.players.append(p)
+		#for p in self.players:
+		#	self.players.append(p)
 
 		# elegir a un jugador para el inicio del turno
-		self.turn = random.choice(self.players)
-	
+		#self.turn = random.choice(self.players)
+		pass
 	# implementar logica del juego para calcular
 	# las proximas jugadas para el turno actual, dependiendo de 
 	# "movements" (stack de jugadas anteriores)

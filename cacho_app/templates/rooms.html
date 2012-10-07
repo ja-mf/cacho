@@ -15,15 +15,7 @@
     </ul>
 </div>
 {% empty %}
-<p>There are currently no rooms! Add one below.</p>
+<p>no hay salas de juego</p>
 {% endfor %}
 <br clear="all">
-{% endblock %}
-
-{% block form %}
-<form method="post" action="{% url create %}">
-    <input type="text" id="name" name="name">
-    <input type="submit" id="submit" value="Add Room">
-    {% csrf_token %}
-</form>
 {% endblock %}
