@@ -15,13 +15,20 @@ class Dudo:
 	def posibles(self, movimiento, maximo_dados):
 		movimientos_posibles = []
 		pinta = 0
-		for i in range (movimiento[0]+1, maximo_dados+1):
-			if ((movimiento[1] != 1) and (pinta == 0)):
-				for j in range (movimiento[1]+1, 7):
-					movimientos_posibles.append((i,j))
-				pinta = 1
-			else:
-				for j in range (1,7):
+		if movimiento[1] != 1:
+			for i in range (movimiento[0], maximo_dados+1):
+				if pinta == 0:
+					movimientos_posibles.append(((movimiento[0]/2)+1,1))
+					for j in range (movimiento[1]+1, 7):
+						movimientos_posibles.append((i,j))
+					pinta = 1
+				else:
+					for j in range (1,7):
+						movimientos_posibles.append((i,j))
+		else:
+			for i in range (movimiento[0]+1, maximo_dados+1):
+				movimientos_posibles.append((i,1))
+			for i in range (movimiento[0]*2, maximo_dados+1):
+				for j in range (2, 7):
 					movimientos_posibles.append((i,j))
 		return movimientos_posibles
-
