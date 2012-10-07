@@ -1,8 +1,14 @@
 #chat,
-#nickname,
 #messages {
   width: 600px;
 }
+
+#nicknames {
+	width: 120px;
+	float: left;
+}
+
+
 #chat {
   position: relative;
   border: 1px solid #ccc;
@@ -65,7 +71,7 @@
 #messages p:nth-child(even) {
   background: #fafafa;
 }
-#messages #nicknames {
+#userlist {
   background: #ccc;
   padding: 2px 4px 4px;
   font: 11px Helvetica;
@@ -73,8 +79,8 @@
 #messages #nicknames span {
   color: #000;
 }
-#messages #nicknames b {
-  display: inline-block;
+#userlist li {
+/*  display: inline-block; */
   color: #fff;
   background: #999;
   padding: 3px 6px;
@@ -126,13 +132,13 @@
   padding: 0 10px;
   line-height: 30px;
   vertical-align: middle;
-  width: 580px;
+  width: 540px;
 }
 #send-message input:focus {
   outline: 0;
 }
 #send-message button {
-  position: absolute;
+/*  position: absolute; */
   top: 5px;
   right: 5px;
 }

@@ -21,16 +21,21 @@
   </form>
   </div>
 -->
-  <div id="connecting">
-    <div class="wrap">Connecting to socket.io server</div>
+  <div id="nicknames"><span>Jugadores:
+	 <ul id="userlist">
+	 </ul>
+	 </span></div>
+ <div id="connecting">
+    <div class="wrap">Conectando al servidor.</div>
   </div>
   <div id="messages">
-    <div id="nicknames"><span>Online:</span></div>
+
     <div id="lines"></div>
   </div>
   <form id="send-message">
     <input id="message">
-    <button>Send</button>
-  </form>
+    <button>Enviar!</button>
+	  </form>
+	   <button id="confirmar">Confirmar!</button>
 </div>
 {% endblock %}

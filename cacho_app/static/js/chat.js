@@ -8,9 +8,10 @@ socket.on('connect', function (username) {
 });
 
 socket.on('usuarios_room', function (usernames) {
-    $('#nicknames').empty().append($('<span>Online: </span>'));
+    $('#userlist').empty();
+//	 alert(JSON.stringify(usernames));
     for (var i in usernames) {
-	  $('#nicknames').append($('<b>').text(usernames[i]));
+	  $('#userlist').append('<li>'+usernames[i]+' '+i+'</li>');
     }
 });
 
@@ -65,4 +66,9 @@ $(function () {
     function clear () {
         $('#message').val('').focus();
     };
+
+	 $('#confirmar').click(function () {
+		socket.emit('confirmar', 'YES');
+		alert('CONFIRMEICHON');
+	 });
 });
