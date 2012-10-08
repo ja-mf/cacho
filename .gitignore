@@ -19,3 +19,4 @@ logs
 *.swo
 
 docs
+dev.db

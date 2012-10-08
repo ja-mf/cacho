@@ -23,22 +23,16 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 
 	def initialize(self): 
 		self.logger = logging.getLogger("socketio.chat")
-		self.log("Socketio session started")
-
-		  # entro un usuario, unirlo a la sala:
-		  #self.room = room
-		  # prueba de acceso al request object en el namespace.
-		  # faltaria hacer un modelo de datos para cada room,
-		# hacer la instancia de la logica de juego, un controlador para room si es que se quiere
-		  
+		self.log("socket.io session started!")
 		self.username = self.request.user.username
 		self.emit('session_data', self.username)
 		self.log('Usuario: {0}'.format(self.username))
-		self.broadcast_event('announcement', '%s has connected' % self.username)
+		self.broadcast_event('announcement', '%s se ha conectado' % self.username)
 
 	def log(self, message):
 		self.logger.info("[{0}] {1}".format(self.socket.sessid, message))
- 
+
+	# entrar a la sala
 	def on_join(self, room_in):
 		self.usuarios_room = GameUser.objects.filter(room=room_in)
 		if (self.usuarios_room.count() < self.capacidad):
@@ -64,31 +58,40 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 			self.emit_to_room(self.room, 'usuarios_room', self.usuarios_room)
 			self.emit('usuarios_room', self.usuarios_room)
 		else:
-			self.emit('server_message', 'ta llenoe')
+			self.emit('server_message', 'ta llena la sala oe')
 
 #		self.log(self.room)
 		return True
  
 	def recv_disconnect(self):
-		# borrar usuario de la db
-		# emitir nueva lista de usuarios
+		# se ha desconectado un usuario:
+		# - borrar usuario de la db
+		# - sacarlo del RingBuffer
+		# - emitir nueva lista de usuarios
 		self.log('Desconectado')
 		self.broadcast_event('announcement', '%s se ha desconectado' % self.username)
+
 		d = GameUser.objects.get(session=self.socket.sessid)
 		d.delete()
+
 		self.log('user %s deleted from db.' % self.username)
 
 		self.usuarios_room = dict(GameUser.objects.values_list('user__username', 'confirm').filter(room=self.room))
 
 		self.emit_to_room(self.room, 'usuarios_room', self.usuarios_room)
+
 		self.disconnect(silent=True)
+
 		return True
 	
 	def on_confirmar(self, action):
+		# se ha recibido una confirmacion
+		# invertir la confirmacion actual
 		u = GameUser.objects.get(session=self.socket.sessid)
 		u.confirm = not(u.confirm)
 		u.save()
 
+		# emitir nueva lista de usuarios y confirmaciones
 		self.usuarios_room = dict(GameUser.objects.values_list('user__username', 'confirm').filter(room=self.room))
 		self.emit_to_room(self.room, 'usuarios_room', self.usuarios_room)
 		self.emit('usuarios_room', self.usuarios_room)
@@ -98,18 +101,18 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 			if c == False:
 				break
 			# enviar turno y jugadas posibles
-			self.emit_to_room(self.room, 'server_message', 'todos confirmaron')
+			self.emit_to_room(self.room, 'server_message', 'todos_confirmaron')
 			self.emit_to_room(self.room, 'turno', self.turnos[self.room].get())
 
 	def on_jugada(self, jugada):
-		# hacer la mecanica para recibir una jugada
+		# se recibio una jugada:
 		# pasar turno, si jugada es dudo o calzo, revisar y actualizar la lista de dados del usuario y tirar dados para todos.
 		# comprobar si alguien gano
 		# GAME LOOP
 		pass
 
 	def on_user_message(self, msg):
-		self.log('User message: {0}'.format(msg))
+		self.log('mensaje: {0}'.format(msg))
 		self.emit_to_room(self.room, 'msg_to_room',
 		 	self.username, msg)
 		return True
