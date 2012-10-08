@@ -20,6 +20,8 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 	 
 	capacidad = 3
 	turnos = {}
+	dados = {}
+	el_dudo = Dudo()
 
 	def initialize(self): 
 		self.logger = logging.getLogger("socketio.chat")
@@ -52,7 +54,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 
 			# ahora usuarios_room es una lista de usuarios en la sala (strings)
 			# esto es hecho gracias a values_list, de otra forma, serian objetos.
-			self.usuarios_room = dict(GameUser.objects.values_list('user__username', 'confirm').filter(room=room_in))
+			self.usuarios_room = list(GameUser.objects.values_list('user__username', 'confirm').filter(room=room_in))
 	
 			# emitir la lista de usuarios al cuarto y al usuario conectado
 			self.emit_to_room(self.room, 'usuarios_room', self.usuarios_room)
@@ -76,7 +78,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 
 		self.log('user %s deleted from db.' % self.username)
 
-		self.usuarios_room = dict(GameUser.objects.values_list('user__username', 'confirm').filter(room=self.room))
+		self.usuarios_room = list(GameUser.objects.values_list('user__username', 'confirm').filter(room=self.room))
 
 		self.emit_to_room(self.room, 'usuarios_room', self.usuarios_room)
 
@@ -92,24 +94,60 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		u.save()
 
 		# emitir nueva lista de usuarios y confirmaciones
-		self.usuarios_room = dict(GameUser.objects.values_list('user__username', 'confirm').filter(room=self.room))
+		self.usuarios_room = list(GameUser.objects.values_list('user__username', 'confirm').filter(room=self.room))
 		self.emit_to_room(self.room, 'usuarios_room', self.usuarios_room)
 		self.emit('usuarios_room', self.usuarios_room)
 
 		# verificar que todos hayan confirmado
 		for c in self.usuarios_room.values():
 			if c == False:
-				break
-			# enviar turno y jugadas posibles
-			self.emit_to_room(self.room, 'server_message', 'todos_confirmaron')
-			self.emit_to_room(self.room, 'turno', self.turnos[self.room].get())
+				return True
+
+		# enviar turno, dados y jugadas posibles
+		turno = self.turnos[self.room].get()
+		self.emit_to_room(self.room, 'server_message', 'todos_confirmaron')
+		self.emit('server_message', 'todos_confirmaron')
+		self.emit_to_room(self.room, 'turno', turno)
+		self.emit('turno', turno)
+
+		# tirar y guardar los dados.
+		lusers = GameUser.objects.all().filter(room=self.room)
+		for luser in lusers:
+			self.dados[self.room][luser.session] = [random.randint(1,6) for i in range(5)]
+
+	# enviar dados al usuario que los pidio
+	def on_get_dados(self):
+		self.emit('dados', self.dados[self.room][self.socket.sessid])
+		
+	# enviar jugadas posibles al usuario que las pidio, n es el numero de dados
+	def on_get_jugadas_posibles(self):
+		n = len(self.dados[self.room][self.socket.sessid])
+		self.emit('jugadas_posibles', self.el_dudo.posibles((0, 6), n))
 
 	def on_jugada(self, jugada):
 		# se recibio una jugada:
 		# pasar turno, si jugada es dudo o calzo, revisar y actualizar la lista de dados del usuario y tirar dados para todos.
 		# comprobar si alguien gano
 		# GAME LOOP
-		pass
+		# jugada[0] = numero de dados
+		# jugada[1] = pinta
+		# comprobar que la jugada es valida
+		# (0, 0) indica calzo
+		# (0, 1) indica dudo
+		jugada = (jugada[0], jugada[1])
+		
+		# movimientos para quitar o ganar un dado
+		# es calzo
+		if jugada == (0, 0):
+			pass
+		# es dudo
+		elif jugada == (0,1):
+			pass
+	
+		# enviar turno
+		turno = self.turnos[self.room].get()
+		self.emit_to_room(self.room, 'turno', turno)
+		self.emit('turno', turno)
 
 	def on_user_message(self, msg):
 		self.log('mensaje: {0}'.format(msg))

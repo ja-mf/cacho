@@ -9,10 +9,10 @@ socket.on('connect', function (username) {
 
 socket.on('usuarios_room', function (usernames) {
     $('#userlist').empty();
-//	 alert(JSON.stringify(usernames));
-    for (var i in usernames) {
-	  $('#userlist').append('<li>'+usernames[i]+' '+i+'</li>');
-    }
+	 //alert(JSON.stringify(usernames));
+	 $.each(usernames, function(k, v) {
+		$('#userlist').append('<li>'+v[0]+' '+v[1]+'</li>');
+	 });
 });
 
 socket.on('server_message', function (data) {
@@ -69,6 +69,6 @@ $(function () {
 
 	 $('#confirmar').click(function () {
 		socket.emit('confirmar', 'YES');
-		alert('CONFIRMEICHON');
+//		alert('CONFIRMEICHON');
 	 });
 });
