@@ -9,7 +9,7 @@ socket.on('connect', function (username) {
 
 socket.on('usuarios_room', function (usernames) {
     $('#userlist').empty();
-	 //alert(JSON.stringify(usernames));
+	 alert(JSON.stringify(usernames));
 	 $.each(usernames, function(k, v) {
 		$('#userlist').append('<li>'+v[0]+' '+v[1]+'</li>');
 	 });
@@ -27,34 +27,22 @@ socket.on('msg_to_room', message);
 
 socket.on('reconnect', function () {
     $('#lines').remove();
-    message('System', 'Reconnected to the server');
+    message('cacho: ', 'r');
 });
 
 socket.on('reconnecting', function () {
-    message('System', 'Attempting to re-connect to the server');
+    message('cacho', 'reconectando al servidor');
 });
 
 socket.on('error', function (e) {
-    message('System', e ? e : 'A unknown error occurred');
+    message('cacho:', e ? e : 'error del servidor!');
 });
 
 function message (from, msg) {
     $('#lines').append($('<p>').append($('<b>').text(from), msg));
 }
 
-// DOM manipulation
 $(function () {
-    $('#set-nickname').submit(function (ev) {
-        socket.emit('nickname', $('#nick').val(), function (set) {
-            if (set) {
-                clear();
-                return $('#chat').addClass('nickname-set');
-            }
-            $('#nickname-err').css('visibility', 'visible');
-        });
-        return false;
-    });
-
     $('#send-message').submit(function () {
 	    message('me', $('#message').val());
 	    socket.emit('user message', $('#message').val());

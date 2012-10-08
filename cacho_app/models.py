@@ -7,6 +7,7 @@ class GameRoom(models.Model):
 
     name = models.CharField(max_length=20)
     slug = models.SlugField(blank=True)
+    state = models.BooleanField(default=False) 
 
     class Meta:
         ordering = ("name",)

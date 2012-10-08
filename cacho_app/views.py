@@ -11,7 +11,7 @@ from cacho_app.cacho_socketio import GameNamespace
 @login_required
 def rooms(request, template="rooms.html"):
     """
-    Homepage - lists all rooms.
+    Listar todos los rooms y sus participantes
     """
     context = {"rooms": GameRoom.objects.all()}
     return render(request, template, context)
@@ -19,7 +19,7 @@ def rooms(request, template="rooms.html"):
 @login_required
 def room(request, slug, template="room.html"):
     """
-    Show a room.
+    Entrar a una sala de juego
     """
     logged_user = request.user.get_full_name()
     context = {"room": get_object_or_404(GameRoom, slug=slug), "user": logged_user}

@@ -40,10 +40,10 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		if (self.usuarios_room.count() < self.capacidad):
 			# si la sala esta vacia, crear el RingBuffer para manipular los turnos
 			# el indice del diccionario "turnos" sera el room id
-			if (self.usuarios_room.count() == 0):
-				self.turnos[room_in] = RingBuffer()
+	#		if (self.usuarios_room.count() == 0):
+		#		self.turnos[room_in] = RingBuffer()
 			
-			self.turnos[room_in].append(self.request.user.id)
+		#	self.turnos[room_in].append(self.request.user.id)
 
 			# variables de instancia, join agregara el usuario al room manejado por el socket
 			# agregar al usuario a la db
@@ -99,21 +99,21 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		self.emit('usuarios_room', self.usuarios_room)
 
 		# verificar que todos hayan confirmado
-		for c in self.usuarios_room.values():
-			if c == False:
+		for c in self.usuarios_room:
+			if c[1] == False:
 				return True
 
 		# enviar turno, dados y jugadas posibles
-		turno = self.turnos[self.room].get()
+#		turno = self.turnos[self.room].get()
 		self.emit_to_room(self.room, 'server_message', 'todos_confirmaron')
 		self.emit('server_message', 'todos_confirmaron')
-		self.emit_to_room(self.room, 'turno', turno)
-		self.emit('turno', turno)
+#		self.emit_to_room(self.room, 'turno', turno)
+#		self.emit('turno', turno)
 
 		# tirar y guardar los dados.
 		lusers = GameUser.objects.all().filter(room=self.room)
-		for luser in lusers:
-			self.dados[self.room][luser.session] = [random.randint(1,6) for i in range(5)]
+#		for luser in lusers:
+#			self.dados[self.room][luser.session] = [random.randint(1,6) for i in range(5)]
 
 	# enviar dados al usuario que los pidio
 	def on_get_dados(self):
