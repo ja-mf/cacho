@@ -1,18 +1,42 @@
 // socket.io specific code
 // funciones de socket del cliente.
 var socket = io.connect("/game");
+var sessid;
+var user_list;
 
 socket.on('connect', function (username) {
    $('#chat').addClass('connected');
    socket.emit('join', window.room);
 });
 
+socket.on('user_sessid', function(id) {
+	sessid = id;
+//	alert(sessid);
+});
+
+socket.on('turno', function(turno) {
+//	alert(turno);
+	if (turno == sessid) {
+		alert("mi turno");
+		// es el turno de este cliente
+		// poblar el select box
+	} else {
+		$.each(user_list, function (k, v) {
+			$('#'+v['user_name']).removeClass("turno");
+			if (v['sessid'] == turno) {
+				$('#'+v['user_name']).addClass("turno");
+			}
+		});
+	}
+});
+
 socket.on('usuarios_room', function (usernames) {
+	user_list = usernames;
     $('#userlist').empty();
 //	 alert(JSON.stringify(usernames));
 
 	 $.each(usernames, function(k, v) {
-		$('#userlist').append('<li>'+v['user_name']+' '+v['confirm']+'</li>');
+		$('#userlist').append('<li id="'+ v['user_name'] +'">'+v['user_name']+' '+v['confirm']+'</li>');
 	 });
 });
 

@@ -8,6 +8,9 @@
 	float: left;
 }
 
+.turno {
+	background-color: red;
+}
 
 #chat {
   position: relative;

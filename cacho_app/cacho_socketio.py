@@ -11,6 +11,7 @@ from Dudo import Dudo, RingBuffer
 
 import redis
 import json
+import random
 
 # este modulo maneja la interaccion de gevent-socketio (parte del servidor)
 # con el javascript del cliente (socket.io). estan definidos metodos de un namespace
@@ -40,14 +41,17 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 
 	# entrar a la sala
 	def on_join(self, room_in):
-		self.usuarios_room = GameUser.objects.filter(room=room_in)
-		if (self.usuarios_room.count() < self.capacidad):
+		# cantidad de usuarios en la sala actual
+		u = len(self.redisdb.smembers('room_' + room_in))
+
+		if (u < self.capacidad):
 			# si la sala esta vacia, crear el RingBuffer para manipular los turnos
 			# el indice del diccionario "turnos" sera el room id
-	#		if (self.usuarios_room.count() == 0):
-		#		self.turnos[room_in] = RingBuffer()
+			if (u == 0):
+				self.turnos[room_in] = RingBuffer()
 			
-		#	self.turnos[room_in].append(self.request.user.id)
+			self.turnos[room_in].append(self.socket.sessid)
+			self.log(self.turnos[room_in].data)
 
 			# variables de instancia, join agregara el usuario al room manejado por el socket
 			# agregar al usuario a la db
@@ -62,12 +66,16 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 			# user_sessid de todos los ususarios en la sala.
 			user_session = json.dumps({'user_id': self.request.user.id, 
 												'user_name': self.request.user.username,
-												'dados': [0]*5, 
 												'confirm': False})
 
+			dados_session = json.dumps({'dados': [0]*5})
+
 			self.redisdb.set('user_' + self.socket.sessid, user_session)
+			self.redisdb.set('dados_' + self.socket.sessid, dados_session)
 			self.redisdb.sadd('room_' + self.room, self.socket.sessid)
 			self.log(user_session)
+
+			self.emit('user_sessid', self.socket.sessid)
 
 			# devolver la nueva lista de usuarios con las confirmaciones
 			self.emit_to_room(self.room, 'usuarios_room', self.json_users_info(self.room))
@@ -112,29 +120,36 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		self.redisdb.set('user_' + self.socket.sessid, json.dumps(u))
 
 		# emitir nueva lista de usuarios y confirmaciones
-		self.emit_to_room(self.room, 'usuarios_room', self.json_users_info(self.room))
-		self.emit('usuarios_room', self.json_users_info(self.room))
+		users = self.json_users_info(self.room)
+		self.emit_to_room(self.room, 'usuarios_room', users)
+		self.emit('usuarios_room', users)
 
 		# verificar que todos hayan confirmado
 		for c in self.json_users_info(self.room):
 			if c['confirm'] == False:
 				return True
 
-		# enviar turno, dados y jugadas posibles
-#		turno = self.turnos[self.room].get()
 		self.emit_to_room(self.room, 'server_message', 'todos_confirmaron')
 		self.emit('server_message', 'todos_confirmaron')
-#		self.emit_to_room(self.room, 'turno', turno)
-#		self.emit('turno', turno)
 
-		# tirar y guardar los dados.
-#		lusers = GameUser.objects.all().filter(room=self.room)
-#		for luser in lusers:
-#			self.dados[self.room][luser.session] = [random.randint(1,6) for i in range(5)]
+		# tirar dados, turno y jugadas posibles
+		for sessid in self.redisdb.smembers('room_' + self.room):
+			dados = [random.randint(1,6) for i in range(5)]
+			self.redisdb.set('dados_' + sessid, json.dumps(dados))
+
+#		users =  self.json_users_info(self.room)
+#		self.emit_to_room(self.room, 'usuarios_room', users)
+#		self.emit('usuarios_room', users)
+
+		turno = self.turnos[self.room].get()
+		self.emit_to_room(self.room, 'turno', turno)
+		self.emit('turno', turno)
 
 	# enviar dados al usuario que los pidio
 	def on_get_dados(self):
-		self.emit('dados', self.dados[self.room][self.socket.sessid])
+		
+		self.emit('dados', self.redisdb.get('dados_' + self.socket.sessid))
+		return True
 		
 	# enviar jugadas posibles al usuario que las pidio, n es el numero de dados
 	def on_get_jugadas_posibles(self):
