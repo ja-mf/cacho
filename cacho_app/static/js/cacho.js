@@ -4,7 +4,7 @@ var socket = io.connect("/game");
 var sessid;
 var user_list;
 
-var numeros = ['ningun', 'un', 'dos', 'tres', 'cuatro', 'cinco'
+var numeros = ['ningun', 'un', 'dos', 'tres', 'cuatro', 'cinco',
 					'seis', 'siete', 'ocho', 'nueve', 'diez', 'once',
 					'doce', 'trece', 'catorce', 'quince', 'dieciseis',
 					'diecisiete', 'dieciocho', 'diecinueve', 'veinte']
@@ -24,8 +24,7 @@ socket.on('turno', function(turno) {
 //	alert(turno);
 	if (turno == sessid) {
 		alert("mi turno");
-		// es el turno de este cliente
-		// poblar el select box
+		socket.emit('get_jugadas_posibles');
 	} else {
 		$.each(user_list, function (k, v) {
 			$('#'+v['user_name']).removeClass("turno");
@@ -49,7 +48,7 @@ socket.on('usuarios_room', function (usernames) {
 socket.on('jugadas_posibles', function(jugadas) {
 	$('#jugadas').empty();
 	$.each(jugadas, function(k, v) {
-		$('#jugadas').append('<option value="['+v[0]','+v[1]']">'+numeros[v[0]]+' '+pintas[v[1]]+'</option>');
+		$('#jugadas').append('<option value="['+v[0]+','+v[1]+']">'+numeros[v[0]]+' '+pintas[v[1]]+'</option>');
 	});
 });
 
@@ -99,6 +98,14 @@ $(function () {
 	 });
 
 	 $('#jugar').click(function() {
-		 socket.emit('jugada', $('#jugada').val());
+		 alert($('#jugadas').val());
+		 socket.emit('jugada', $('#jugadas').val());
 	 });
+	$('#dudo').click(function () {
+		socket.emit('jugada', '[0,1]');
+	});
+
+	$('#calzo').click(function () {
+		socket.emit('jugada', '[0,0]');
+	});
 });

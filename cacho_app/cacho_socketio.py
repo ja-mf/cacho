@@ -30,6 +30,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 	totaldados = {}
 	actualdados = {}
 	firstplay = {}
+	current_play = {}
 
 	def initialize(self): 
 		self.logger = logging.getLogger("socketio.chat")
@@ -121,8 +122,8 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		u = json.loads(self.redisdb.get('user_' + self.socket.sessid))
 		u['confirm'] = not(u['confirm'])
 		self.redisdb.set('user_' + self.socket.sessid, json.dumps(u))
-		totaldados[self.room] = 0
-		actualdados[self.room] = 0
+		self.totaldados[self.room] = 0
+		self.actualdados[self.room] = 0
 
 		# emitir nueva lista de usuarios y confirmaciones
 		users = self.json_users_info(self.room)
@@ -141,14 +142,14 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		for sessid in self.redisdb.smembers('room_' + self.room):
 			dados = [random.randint(1,6) for i in range(5)]
 			self.redisdb.set('dados_' + sessid, json.dumps(dados))
-			totaldados[self.room] += 5
-			actualdados[self.room] += 5
+			self.totaldados[self.room] += 5
+			self.actualdados[self.room] += 5
 
 #		users =  self.json_users_info(self.room)
 #		self.emit_to_room(self.room, 'usuarios_room', users)
 #		self.emit('usuarios_room', users)
 
-		firstplay[self.room] = 1
+		self.firstplay[self.room] = 1
 		turno = self.turnos[self.room].get()
 		self.emit_to_room(self.room, 'turno', turno)
 		self.emit('turno', turno)
@@ -160,15 +161,14 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		return True
 		
 	# enviar jugadas posibles al usuario que las pidio, n es el numero de dados
-	def on_get_jugadas_posibles(self, j):
-		n = actualdados[self.room]
-		jugada = (j[0], j[1])
+	def on_get_jugadas_posibles(self):
+		n = self.actualdados[self.room]
 		
-		if (firstplay[self.room]):
+		if (self.firstplay[self.room]):
 			self.emit('jugadas_posibles', self.el_dudo.posibles((0, 6), n))
-			firsplay[self.room] = 0
+			self.firstplay[self.room] = 0
 		else: 
-			self.emit('jugadas_posibles', self.el_dudo.posbiles(jugada, n))
+			self.emit('jugadas_posibles', self.el_dudo.posbiles(self.current[self.room], n))
 		
 
 	def on_jugada(self, j):
@@ -184,12 +184,36 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		jugada = (j[0], j[1])
 		
 		# movimientos para quitar o ganar un dado
+		usuarios = self.redisdb.smembers(self.room)
+		# dados_mesa, el total de dados que hay en la mesa
+		dados_mesa = []
+		for u in usuarios:
+			dados_mesa.append(json.loads(self.redisdb.get('dados_' + u)))
+		
+		# flatten list!
+		dados_mesa = [item for sublist in dados_mesa for item in sublist]
+		
+		if jugada[1] != 1:
+			# aces + pinta
+			nreal = dados_mesa.count(1) + dados_mesa.count(jugada[1])
+		else:
+			nreal = dados_mesa_count(1)
+
+		n = self.redisdb.get('dados_' + self.socket.sessid)
+
 		# es calzo
-		if jugada == (0, 0):
-			pass
+		if jugada == (0,0):
+			if (jugada[0] == nreal):
+				n.append('0')
+			else:
+				n.pop()
+
+			self.redisdb.set('dados_' + self.socket.sessid, n)
+
 		# es dudo
 		elif jugada == (0,1):
-			pass
+			if (jugada[0] < nreal):
+				# weas pa quitarle un dado al anterior
 	
 		# enviar turno
 		turno = self.turnos[self.room].get()
