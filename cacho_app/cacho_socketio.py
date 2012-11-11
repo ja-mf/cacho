@@ -9,6 +9,9 @@ from cacho_app.models import GameUser, GameRoom
 from django.http import HttpResponse
 from Dudo import Dudo, RingBuffer
 
+import redis
+import json
+
 # este modulo maneja la interaccion de gevent-socketio (parte del servidor)
 # con el javascript del cliente (socket.io). estan definidos metodos de un namespace
 # (ver documentacion de gevent-socketio), las cuales se ejecutaran dependiendo del mensaje 
@@ -22,6 +25,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 	turnos = {}
 	dados = {}
 	el_dudo = Dudo()
+	redisdb = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 	def initialize(self): 
 		self.logger = logging.getLogger("socketio.chat")
@@ -49,22 +53,52 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 			# agregar al usuario a la db
 			self.room = room_in
 			self.join(room_in)
-			user = GameUser(user=self.request.user, room=GameRoom.objects.get(pk=self.room), session=self.socket.sessid, confirm=False)
-			user.save()
+			
+			# old (guardar usuario activo en el modelo)
+			#user = GameUser(user=self.request.user, room=GameRoom.objects.get(pk=self.room), session=self.socket.sessid, confirm=False)
+			#user.save()
 
 			# ahora usuarios_room es una lista de usuarios en la sala (strings)
 			# esto es hecho gracias a values_list, de otra forma, serian objetos.
-			self.usuarios_room = list(GameUser.objects.values_list('user__username', 'confirm').filter(room=room_in))
+			#self.usuarios_room = list(GameUser.objects.values_list('user__username', 'confirm').filter(room=room_in))
 	
 			# emitir la lista de usuarios al cuarto y al usuario conectado
-			self.emit_to_room(self.room, 'usuarios_room', self.usuarios_room)
-			self.emit('usuarios_room', self.usuarios_room)
+#			self.emit_to_room(self.room, 'usuarios_room', self.usuarios_room)
+#			self.emit('usuarios_room', self.usuarios_room)
+
+			# new, redis (session)
+			# user_sessid = {'user_id': userid, 'user_name': username, 'dados': [0,0,0,0,0], 'confirm': 0}
+			# room_roomname = ['sessid1', 'sessid2', ...]
+			# bajo este concepto, para formatear la lista de usuarios con las confirmaciones y dados
+			# para enviarselos a los clientes en una sala, se referira primero al room_roomname, para luego referirse al key
+			# user_sessid de todos los ususarios en la sala.
+			user_session = json.dumps({'user_id': self.request.user.id, 
+												'user_name': self.request.user.username,
+												'dados': [0]*5, 
+												'confirm': False})
+
+			self.redisdb.set('user_' + self.socket.sessid, user_session)
+			self.redisdb.sadd('room_' + self.room, self.socket.sessid)
+			self.log(user_session)
+
+			# devolver la nueva lista de usuarios con las confirmaciones
+			self.emit_to_room(self.room, 'usuarios_room', self.json_users_info(self.room))
+			self.emit('usuarios_room', self.json_users_info(self.room))
+
 		else:
 			self.emit('server_message', 'ta llena la sala oe')
 
 #		self.log(self.room)
 		return True
  
+	def json_users_info(self, room):
+		room_members = list(self.redisdb.smembers('room_' + room))
+		members = []
+		for sessid in room_members:
+			members.append(json.loads(self.redisdb.get('user_' + sessid)))
+		
+		return members
+
 	def recv_disconnect(self):
 		# se ha desconectado un usuario:
 		# - borrar usuario de la db
@@ -73,14 +107,16 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		self.log('Desconectado')
 		self.broadcast_event('announcement', '%s se ha desconectado' % self.username)
 
-		d = GameUser.objects.get(session=self.socket.sessid)
-		d.delete()
+#		d = GameUser.objects.get(session=self.socket.sessid)
+#		d.delete()
 
-		self.log('user %s deleted from db.' % self.username)
+#		self.log('user %s deleted from db.' % self.username)
+#		self.usuarios_room = list(GameUser.objects.values_list('user__username', 'confirm').filter(room=self.room))
+#		self.emit_to_room(self.room, 'usuarios_room', self.usuarios_room)
 
-		self.usuarios_room = list(GameUser.objects.values_list('user__username', 'confirm').filter(room=self.room))
-
-		self.emit_to_room(self.room, 'usuarios_room', self.usuarios_room)
+		self.redisdb.srem('room_' + self.room, self.socket.sessid)
+		self.redisdb.delete('user_' + self.socket.sessid)
+		self.emit_to_room(self.room, 'usuarios_room', self.json_users_info(self.room))
 
 		self.disconnect(silent=True)
 
@@ -89,18 +125,22 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 	def on_confirmar(self, action):
 		# se ha recibido una confirmacion
 		# invertir la confirmacion actual
-		u = GameUser.objects.get(session=self.socket.sessid)
-		u.confirm = not(u.confirm)
-		u.save()
+#		u = GameUser.objects.get(session=self.socket.sessid)
+#		u.confirm = not(u.confirm)
+#		u.save()
+
+		u = json.loads(self.redisdb.get('user_' + self.socket.sessid))
+		u['confirm'] = not(u['confirm'])
+		self.redisdb.set('user_' + self.socket.sessid, json.dumps(u))
 
 		# emitir nueva lista de usuarios y confirmaciones
-		self.usuarios_room = list(GameUser.objects.values_list('user__username', 'confirm').filter(room=self.room))
-		self.emit_to_room(self.room, 'usuarios_room', self.usuarios_room)
-		self.emit('usuarios_room', self.usuarios_room)
+#		self.usuarios_room = list(GameUser.objects.values_list('user__username', 'confirm').filter(room=self.room))
+		self.emit_to_room(self.room, 'usuarios_room', self.json_users_info(self.room))
+		self.emit('usuarios_room', self.json_users_info(self.room))
 
 		# verificar que todos hayan confirmado
-		for c in self.usuarios_room:
-			if c[1] == False:
+		for c in self.json_users_info(self.room):
+			if c['confirm'] == False:
 				return True
 
 		# enviar turno, dados y jugadas posibles
@@ -111,7 +151,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 #		self.emit('turno', turno)
 
 		# tirar y guardar los dados.
-		lusers = GameUser.objects.all().filter(room=self.room)
+#		lusers = GameUser.objects.all().filter(room=self.room)
 #		for luser in lusers:
 #			self.dados[self.room][luser.session] = [random.randint(1,6) for i in range(5)]
 
