@@ -10,6 +10,10 @@ class RingBuffer:
 		if len(self.data) == self.cur:
 			self.cur=0 	
 		return self.data[self.cur]
+	def set(self, x):
+		self.cur=x
+
+
 
 class Dudo:
 	def posibles(self, movimiento, maximo_dados):
