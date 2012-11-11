@@ -22,7 +22,8 @@ class Dudo:
 		if movimiento[1] != 1:
 			for i in range (movimiento[0], maximo_dados+1):
 				if pinta == 0:
-					movimientos_posibles.append(((movimiento[0]/2)+1,1))
+					if movimiento[0]!=0:
+						movimientos_posibles.append(((movimiento[0]/2)+1,1))
 					for j in range (movimiento[1]+1, 7):
 						movimientos_posibles.append((i,j))
 					pinta = 1
