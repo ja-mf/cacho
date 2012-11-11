@@ -54,18 +54,6 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 			self.room = room_in
 			self.join(room_in)
 			
-			# old (guardar usuario activo en el modelo)
-			#user = GameUser(user=self.request.user, room=GameRoom.objects.get(pk=self.room), session=self.socket.sessid, confirm=False)
-			#user.save()
-
-			# ahora usuarios_room es una lista de usuarios en la sala (strings)
-			# esto es hecho gracias a values_list, de otra forma, serian objetos.
-			#self.usuarios_room = list(GameUser.objects.values_list('user__username', 'confirm').filter(room=room_in))
-	
-			# emitir la lista de usuarios al cuarto y al usuario conectado
-#			self.emit_to_room(self.room, 'usuarios_room', self.usuarios_room)
-#			self.emit('usuarios_room', self.usuarios_room)
-
 			# new, redis (session)
 			# user_sessid = {'user_id': userid, 'user_name': username, 'dados': [0,0,0,0,0], 'confirm': 0}
 			# room_roomname = ['sessid1', 'sessid2', ...]
@@ -107,13 +95,6 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		self.log('Desconectado')
 		self.broadcast_event('announcement', '%s se ha desconectado' % self.username)
 
-#		d = GameUser.objects.get(session=self.socket.sessid)
-#		d.delete()
-
-#		self.log('user %s deleted from db.' % self.username)
-#		self.usuarios_room = list(GameUser.objects.values_list('user__username', 'confirm').filter(room=self.room))
-#		self.emit_to_room(self.room, 'usuarios_room', self.usuarios_room)
-
 		self.redisdb.srem('room_' + self.room, self.socket.sessid)
 		self.redisdb.delete('user_' + self.socket.sessid)
 		self.emit_to_room(self.room, 'usuarios_room', self.json_users_info(self.room))
@@ -125,16 +106,12 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 	def on_confirmar(self, action):
 		# se ha recibido una confirmacion
 		# invertir la confirmacion actual
-#		u = GameUser.objects.get(session=self.socket.sessid)
-#		u.confirm = not(u.confirm)
-#		u.save()
-
+		
 		u = json.loads(self.redisdb.get('user_' + self.socket.sessid))
 		u['confirm'] = not(u['confirm'])
 		self.redisdb.set('user_' + self.socket.sessid, json.dumps(u))
 
 		# emitir nueva lista de usuarios y confirmaciones
-#		self.usuarios_room = list(GameUser.objects.values_list('user__username', 'confirm').filter(room=self.room))
 		self.emit_to_room(self.room, 'usuarios_room', self.json_users_info(self.room))
 		self.emit('usuarios_room', self.json_users_info(self.room))
 

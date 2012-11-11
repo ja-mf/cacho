@@ -9,7 +9,7 @@ socket.on('connect', function (username) {
 
 socket.on('usuarios_room', function (usernames) {
     $('#userlist').empty();
-	 alert(JSON.stringify(usernames));
+//	 alert(JSON.stringify(usernames));
 
 	 $.each(usernames, function(k, v) {
 		$('#userlist').append('<li>'+v['user_name']+' '+v['confirm']+'</li>');
