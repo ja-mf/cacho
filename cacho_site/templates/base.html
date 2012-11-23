@@ -1,0 +1,17 @@
+<!doctype html>
+
+<html lang="es-cl">
+<head>
+
+	<meta charset="utf-8">
+	<title>{% block title %}Chat{% endblock %}</title>
+	{% block extra_css %}{% endblock %}
+	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+	{% block extra_js %}{% endblock %}
+</head>
+
+<body>
+	<div id="main">
+		{% block main %}{% endblock %}
+	</div>
+</body>

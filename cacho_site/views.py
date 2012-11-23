@@ -10,7 +10,9 @@ from django.contrib.auth.forms import UserCreationForm
 
 @login_required
 def index(request):
-	return HttpResponse('this is index. welcome ' + request.user.username)
+	context = {"user": request.user}
+	return render(request, 'index.html', context)
+	#return HttpResponse('this is index. welcome ' + request.user.username)
 	#return HttpResponseRedirect('/play/')
 
 def logout_view(request):

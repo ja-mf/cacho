@@ -47,6 +47,8 @@ socket.on('usuarios_room', function (usernames) {
 
 socket.on('jugadas_posibles', function(jugadas) {
 	$('#jugadas').empty();
+	$('#jugadas').append('<option value="[0,0]">Calzo</option>');
+	$('#jugadas').append('<option value="[0,1]">Dudo</option>');
 	$.each(jugadas, function(k, v) {
 		$('#jugadas').append('<option value="['+v[0]+','+v[1]+']">'+numeros[v[0]]+' '+pintas[v[1]]+'</option>');
 	});

@@ -213,8 +213,9 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		# es dudo
 		elif jugada == (0,1):
 			if (jugada[0] < nreal):
+				pass
 				# weas pa quitarle un dado al anterior
-	
+			
 		# enviar turno
 		turno = self.turnos[self.room].get()
 		self.emit_to_room(self.room, 'turno', turno)

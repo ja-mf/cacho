@@ -2,6 +2,10 @@
 
 {% block title %}{{ room }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/chat.css">
+{% endblock %}
+
 {% block extra_js %}
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
@@ -9,6 +13,7 @@
 <script>WEB_SOCKET_SWF_LOCATION="{{ STATIC_URL }}flashsocket/WebSocketMain.swf"; window.room = "{{ room.id }}";</script>
 <script src="{{ STATIC_URL }}js/cacho.js"></script>
 {% endblock %}
+
 
 {% block main %}
 <div id="chat">
@@ -29,9 +34,10 @@
 	  </form>
 	   <button id="confirmar">Confirmar!</button>
 </div>
-<select id="jugadas">
-</select>
-<button id="jugar">jugar!</button>
-<button id="dudo">dudo!</button>
-<button id="calzo">calzo!</button>
+<!--<form id="jugar"> -->
+	<select id="jugadas">
+	</select>
+	<div id="jugar">jugar!</div>
+<!--</form> -->
+
 {% endblock %}
