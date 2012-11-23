@@ -60,6 +60,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.staticfiles',
+	 'cacho_site',
     'cacho_app',
 #	 'debug_toolbar',
 )

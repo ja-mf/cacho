@@ -9,7 +9,7 @@ from cacho_app.models import GameUser, GameRoom
 from django.http import HttpResponse
 from Dudo import Dudo, RingBuffer
 
-import redis
+import redisutils
 import json
 import random
 
@@ -26,7 +26,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 	turnos = {}
 	dados = {}
 	el_dudo = Dudo()
-	redisdb = redis.StrictRedis(host='localhost', port=6379, db=0)
+#	redisdb = redis.StrictRedis(host='localhost', port=6379, db=0)
 	totaldados = {}
 	actualdados = {}
 	firstplay = {}
@@ -46,7 +46,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 	# entrar a la sala
 	def on_join(self, room_in):
 		# cantidad de usuarios en la sala actual
-		u = len(self.redisdb.smembers('room_' + room_in))
+		u = redisutils.get_members(room_in)
 
 		if (u < self.capacidad):
 			# si la sala esta vacia, crear el RingBuffer para manipular los turnos
@@ -74,31 +74,22 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 
 			dados_session = json.dumps({'dados': [0]*5})
 
-			self.redisdb.set('user_' + self.socket.sessid, user_session)
-			self.redisdb.set('dados_' + self.socket.sessid, dados_session)
-			self.redisdb.sadd('room_' + self.room, self.socket.sessid)
+			redisutils.redisdb.set('user_' + self.socket.sessid, user_session)
+			redisutils.redisdb.set('dados_' + self.socket.sessid, dados_session)
+			redisutils.redisdb.sadd('room_' + self.room, self.socket.sessid)
 			self.log(user_session)
 
 			self.emit('user_sessid', self.socket.sessid)
 
 			# devolver la nueva lista de usuarios con las confirmaciones
-			self.emit_to_room(self.room, 'usuarios_room', self.json_users_info(self.room))
-			self.emit('usuarios_room', self.json_users_info(self.room))
+			self.emit_to_room(self.room, 'usuarios_room', redisutils.get_members_info(self.room))
+			self.emit('usuarios_room', redisutils.get_members_info(self.room))
 
 		else:
 			self.emit('server_message', 'ta llena la sala oe')
 
-#		self.log(self.room)
 		return True
  
-	def json_users_info(self, room):
-		room_members = list(self.redisdb.smembers('room_' + room))
-		members = []
-		for sessid in room_members:
-			members.append(json.loads(self.redisdb.get('user_' + sessid)))
-		
-		return members
-
 	def recv_disconnect(self):
 		# se ha desconectado un usuario:
 		# - borrar usuario de la db
@@ -107,9 +98,13 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		self.log('Desconectado')
 		self.broadcast_event('announcement', '%s se ha desconectado' % self.username)
 
-		self.redisdb.srem('room_' + self.room, self.socket.sessid)
-		self.redisdb.delete('user_' + self.socket.sessid)
-		self.emit_to_room(self.room, 'usuarios_room', self.json_users_info(self.room))
+		redisutils.redisdb.srem('room_' + self.room, self.socket.sessid)
+		redisutils.redisdb.delete('user_' + self.socket.sessid)
+		redisutils.redisdb.delete('dados_' + self.socket.sessid)
+
+		# falta sacarlo del ringbuffer aqui
+
+		self.emit_to_room(self.room, 'usuarios_room', redisutils.get_members_info(self.room))
 
 		self.disconnect(silent=True)
 
@@ -119,19 +114,19 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		# se ha recibido una confirmacion
 		# invertir la confirmacion actual
 		
-		u = json.loads(self.redisdb.get('user_' + self.socket.sessid))
+		u = json.loads(redisutils.redisdb.get('user_' + self.socket.sessid))
 		u['confirm'] = not(u['confirm'])
-		self.redisdb.set('user_' + self.socket.sessid, json.dumps(u))
+		redisutils.redisdb.set('user_' + self.socket.sessid, json.dumps(u))
 		self.totaldados[self.room] = 0
 		self.actualdados[self.room] = 0
 
 		# emitir nueva lista de usuarios y confirmaciones
-		users = self.json_users_info(self.room)
+		users = redisutils.get_members_info(self.room)
 		self.emit_to_room(self.room, 'usuarios_room', users)
 		self.emit('usuarios_room', users)
 
 		# verificar que todos hayan confirmado
-		for c in self.json_users_info(self.room):
+		for c in users:
 			if c['confirm'] == False:
 				return True
 
@@ -139,13 +134,13 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		self.emit('server_message', 'todos_confirmaron')
 
 		# tirar dados, turno y jugadas posibles
-		for sessid in self.redisdb.smembers('room_' + self.room):
+		for sessid in redisutils.redisdb.smembers('room_' + self.room):
 			dados = [random.randint(1,6) for i in range(5)]
-			self.redisdb.set('dados_' + sessid, json.dumps(dados))
+			redisutils.redisdb.set('dados_' + sessid, json.dumps(dados))
 			self.totaldados[self.room] += 5
 			self.actualdados[self.room] += 5
 
-#		users =  self.json_users_info(self.room)
+#		users =  redisutils.get_members_info(self.room)
 #		self.emit_to_room(self.room, 'usuarios_room', users)
 #		self.emit('usuarios_room', users)
 
@@ -156,8 +151,8 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 
 	# enviar dados al usuario que los pidio
 	def on_get_dados(self):
-		
-		self.emit('dados', self.redisdb.get('dados_' + self.socket.sessid))
+		# tirar dados?
+		self.emit('dados', redisutils.redisdb.get('dados_' + self.socket.sessid))
 		return True
 		
 	# enviar jugadas posibles al usuario que las pidio, n es el numero de dados
@@ -168,7 +163,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 			self.emit('jugadas_posibles', self.el_dudo.posibles((0, 6), n))
 			self.firstplay[self.room] = 0
 		else: 
-			self.emit('jugadas_posibles', self.el_dudo.posbiles(self.current[self.room], n))
+			self.emit('jugadas_posibles', self.el_dudo.posibles(self.current_play[self.room], n))
 		
 
 	def on_jugada(self, j):
@@ -184,11 +179,12 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		jugada = (j[0], j[1])
 		
 		# movimientos para quitar o ganar un dado
-		usuarios = self.redisdb.smembers(self.room)
+		usuarios = redisutils.redisdb.smembers(self.room)
+
 		# dados_mesa, el total de dados que hay en la mesa
 		dados_mesa = []
 		for u in usuarios:
-			dados_mesa.append(json.loads(self.redisdb.get('dados_' + u)))
+			dados_mesa.append(json.loads(redisutils.redisdb.get('dados_' + u)))
 		
 		# flatten list!
 		dados_mesa = [item for sublist in dados_mesa for item in sublist]
@@ -199,7 +195,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		else:
 			nreal = dados_mesa_count(1)
 
-		n = self.redisdb.get('dados_' + self.socket.sessid)
+		n = redisutils.redisdb.get('dados_' + self.socket.sessid)
 
 		# es calzo
 		if jugada == (0,0):
@@ -208,7 +204,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 			else:
 				n.pop()
 
-			self.redisdb.set('dados_' + self.socket.sessid, n)
+			redisutils.redisdb.set('dados_' + self.socket.sessid, n)
 
 		# es dudo
 		elif jugada == (0,1):
