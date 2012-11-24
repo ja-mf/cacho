@@ -10,6 +10,8 @@ class RingBuffer:
 		if len(self.data) == self.cur:
 			self.cur=0 	
 		return self.data[self.cur]
+	def get_current(self):
+		return self.data[self.cur]
 	def previous(self):
 		self.cur-=1
 		if self.cur < 0:

@@ -22,6 +22,7 @@ socket.on('user_sessid', function(id) {
 
 socket.on('turno', function(turno) {
 //	alert(turno);
+	socket.emit('get_dados');
 	if (turno == sessid) {
 		alert("mi turno");
 		socket.emit('get_jugadas_posibles');
@@ -51,6 +52,13 @@ socket.on('jugadas_posibles', function(jugadas) {
 	$('#jugadas').append('<option value="[0,1]">Dudo</option>');
 	$.each(jugadas, function(k, v) {
 		$('#jugadas').append('<option value="['+v[0]+','+v[1]+']">'+numeros[v[0]]+' '+pintas[v[1]]+'</option>');
+	});
+});
+
+socket.on('dados_user', function(dados) {
+	$('#dados').empty();
+	$.each(dados, function(k,v) {
+		$('#dados').append(v);	
 	});
 });
 
