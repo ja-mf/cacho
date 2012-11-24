@@ -35,6 +35,11 @@
 				  	<li><a href="/logout/">Logout</a></li>
 				  {% endif %}
             </ul>
+				{% if user.is_authenticated %}
+				<p class="pull-right navbar-text">hola amigo {{ user.username }}</p>
+				{% else %}
+				<p class="pull-right navbar-text">no registrado</p>
+				{% endif %}
           </div><!--/.nav-collapse -->
         </div>
       </div>

@@ -24,7 +24,7 @@ socket.on('turno', function(turno) {
 //	alert(turno);
 	socket.emit('get_dados');
 	if (turno == sessid) {
-		alert("mi turno");
+		message("server", "mi turno");
 		socket.emit('get_jugadas_posibles');
 	} else {
 		$.each(user_list, function (k, v) {
@@ -60,13 +60,15 @@ socket.on('jugadas_posibles', function(jugadas) {
 
 socket.on('dados_user', function(dados) {
 	$('#dados').empty();
-	$.each(dados, function(k,v) {
-		$('#dados').append(v);	
+	$.each(dados, function(k, v) {
+		$('#dados').append('<img src="/static/img/die_face_'+v+'.png" /> ');
 	});
 });
 
 socket.on('server_message', function (data) {
-	alert(data)
+	message('server', data);
+	if (data == 'todos_confirmaron')
+		$('#confirmar').hide();
 });
 
 socket.on('announcement', function (msg) {
@@ -92,6 +94,8 @@ function message (from, msg) {
     $('#lines').append($('<p>').append($('<b>').text(from), msg));
 }
 
+
+
 $(function () {
     $('#send-message').submit(function () {
 	    message('me', $('#message').val());
@@ -111,7 +115,7 @@ $(function () {
 	 });
 
 	 $('#jugar').click(function() {
-		 alert($('#jugadas').val());
+		 message('debug',$('#jugadas').val());
 		 socket.emit('jugada', $('#jugadas').val());
 	 });
 	$('#dudo').click(function () {
