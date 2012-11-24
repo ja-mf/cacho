@@ -67,6 +67,7 @@ socket.on('dados_user', function(dados) {
 
 socket.on('revolver_dados', function() {
 	socket.emit('revolver');
+	socket.emit("get_dados");
 });
 
 socket.on('server_message', function (data) {
@@ -121,6 +122,7 @@ $(function () {
 	 $('#jugar').click(function() {
 		 message('debug',$('#jugadas').val());
 		 socket.emit('jugada', $('#jugadas').val());
+		socket.emit('user message', $('#jugadas').val());
 	 });
 	$('#dudo').click(function () {
 		socket.emit('jugada', '[0,1]');

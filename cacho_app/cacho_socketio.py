@@ -199,7 +199,8 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 			# aces + pinta
 			nreal = dados_mesa.count(1) + dados_mesa.count(self.current_play[self.room][1])
 		else:
-			nreal = dados_mesa_count(1)
+			nreal = dados_mesa.count(1)
+			self.log(nreal)
 		
 		
 		n =json.loads(redisutils.redisdb.get('dados_' + self.socket.sessid))
