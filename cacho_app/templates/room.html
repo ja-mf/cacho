@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}{{ room }}{% endblock %}
+{% block title %}Dudo - {{ room }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ STATIC_URL }}css/chat.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/da_room.css">
 {% endblock %}
 
 {% block extra_js %}
@@ -16,6 +16,32 @@
 
 
 {% block main %}
+<div class="row">
+	<!-- panel izquierdo -->
+	<div id="left-panel" class="span3 well">
+		<h4>Jugadores:</h4>
+		<ul id="userlist">
+		</ul>
+		<div id="confirmar" class="btn btn-info">Ready</div>
+	</div>
+
+	<!-- panel derecho -->
+	<div id="main-game" class="span8">
+	<div id="dados"></div><br/>
+	<select id="jugadas"></select>
+	<div id="jugar" class="btn btn-primary">jugar!</div>
+
+		<div id="messages" class="row">
+			<div id="lines"></div>
+			<div class="span6">
+				<form id="send-message">
+					<input id="message" /><button>Enviar!</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!--
 <div id="chat">
 <div id="nicknames"><span>Jugadores:
 	 <ul id="userlist">
@@ -34,12 +60,8 @@
 	  </form>
 	   <button id="confirmar">Confirmar!</button>
 </div>
-<!--<form id="jugar"> -->
 	<select id="jugadas">
 	</select>
-	<select id="dados">
-	</select>
 	<div id="jugar">jugar!</div>
-<!--</form> -->
-
+-->
 {% endblock %}
