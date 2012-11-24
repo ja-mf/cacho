@@ -65,6 +65,10 @@ socket.on('dados_user', function(dados) {
 	});
 });
 
+socket.on('revolver_dados', function() {
+	socket.emit('revolver');
+});
+
 socket.on('server_message', function (data) {
 	message('server', data);
 	if (data == 'todos_confirmaron')
