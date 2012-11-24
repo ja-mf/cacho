@@ -183,7 +183,6 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		# (0, 0) indica calzo
 		# (0, 1) indica dudo
 		jugada = (int(j[1]), int(j[3]))
-		self.log(jugada)
 		if(self.firstplay[self.room]):
 			self.current_play[self.room] = jugada
 			self.firstplay[self.room] = 0
@@ -212,6 +211,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 				n.pop()
 			if (len(n)==0):
 				self.emit('player_lost')
+				self.log('asdf')
 			redisutils.redisdb.set('dados_' + self.socket.sessid, n)
 			self.current_play[self.room] = (0,6)
 			self.emit('revolver_dados')
