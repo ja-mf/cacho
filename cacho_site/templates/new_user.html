@@ -1,5 +1,6 @@
-{% block content %}
-
+{% extends "base.html" %}
+{% block main %}
+<div class="well">
 {% if form.errors %}
 <p>el formulario contiene errores.</p>
 {% endif %}
@@ -8,8 +9,8 @@
 {% csrf_token %}
 {{ form.as_p }}
 
-<input type="submit" value="register" />
+<input type="submit" value="Registrar" class="btn btn-primary" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
-
+</div>
 {% endblock %}

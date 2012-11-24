@@ -42,7 +42,10 @@ socket.on('usuarios_room', function (usernames) {
 //	 alert(JSON.stringify(usernames));
 
 	 $.each(usernames, function(k, v) {
-		$('#userlist').append('<li id="'+ v['user_name'] +'">'+v['user_name']+' '+v['confirm']+'</li>');
+		 if (v['confirm']) 
+			$('#userlist').append('<li id="'+ v['user_name'] +'"><i class="icon-ok"></i> '+v['user_name']+'</li>');
+		 else
+			$('#userlist').append('<li id="'+ v['user_name'] +'"><i class="icon-remove"></i> '+v['user_name']+'</li>');
 	 });
 });
 
