@@ -224,6 +224,12 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 				self.emit('turno', turno)
 				self.log('dudo')
 			else:
+				turno = self.turnos[self.room].previous() 
+				n =json.loads(redisutils.redisdb.get('dados_' + turno))
+				n.pop()
+				redisutils.redisdb.set('dados_' + turno, n)
+				self.emit_to_room(self.room, 'turno', turno)
+				self.emit('turno', turno)
 				self.log('not')
 				pass
 		else:		# weas pa quitarle un dado al anterior
