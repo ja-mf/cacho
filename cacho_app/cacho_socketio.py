@@ -158,6 +158,10 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		return True
 		
 	# enviar jugadas posibles al usuario que las pidio, n es el numero de dados
+	#def on_check_winner(self):
+	#	if(len(self.turnos[self.room]==1):
+	#		self.emit			
+	
 	def on_get_jugadas_posibles(self):
 		n = self.actualdados[self.room]
 		
@@ -188,7 +192,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 			self.firstplay[self.room] = 0
 		# movimientos para quitar o ganar un dado
 		usuarios = redisutils.redisdb.smembers('room_' + str(self.room))
-
+		
 		# dados_mesa, el total de dados que hay en la mesa
 		dados_mesa = []
 		for u in usuarios:
@@ -211,15 +215,21 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 				n.pop()
 			if (len(n)==0):
 				self.emit('player_lost')
-				self.log('asdf')
-			redisutils.redisdb.set('dados_' + self.socket.sessid, n)
-			self.current_play[self.room] = (0,6)
-			self.emit('revolver_dados')
-                        self.emit_to_room(self.room,'revolver_dados')
-			self.firstplay[self.room] = 1
-			turno = self.turnos[self.room].get_current()
-			self.emit('turno', turno)
-			self.emit_to_room(self.room, 'turno', turno)
+				redisutils.redisdb.set('dados_' + self.socket.sessid, n)
+				turno = self.turnos[self.room].get()
+				self.firstplay[self.room] = 1
+				self.emit('turno',turno)
+				self.emit_to_room(self.room, 'turno', turno)
+				self.turnos[self.room].remove(self.socket.sessid)		
+			else:
+				redisutils.redisdb.set('dados_' + self.socket.sessid, n)
+				self.current_play[self.room] = (0,6)
+				self.emit('revolver_dados')
+                        	self.emit_to_room(self.room,'revolver_dados')
+				self.firstplay[self.room] = 1
+				turno = self.turnos[self.room].get_current()
+				self.emit('turno', turno)
+				self.emit_to_room(self.room, 'turno', turno)
 
 		# es dudo
 		elif jugada == (0,1):
