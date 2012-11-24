@@ -12,6 +12,7 @@
 <script src="{{ STATIC_URL|default:MEDIA_URL }}js/socket.io.js"></script>
 <script>WEB_SOCKET_SWF_LOCATION="{{ STATIC_URL }}flashsocket/WebSocketMain.swf"; window.room = "{{ room.id }}";</script>
 <script src="{{ STATIC_URL }}js/cacho.js"></script>
+<script src="{{ STATIC_URL }}js/extra.js"></script>
 {% endblock %}
 
 
@@ -22,14 +23,26 @@
 		<h4>Jugadores:</h4>
 		<ul id="userlist">
 		</ul>
-		<div id="confirmar" class="btn btn-info">Ready</div>
-	</div>
+			</div>
 
 	<!-- panel derecho -->
 	<div id="main-game" class="span8">
+	<!-- alert messages -->
+	<div class="alert" id="alerts">
+		Esperando a que todos los jugadores confirmen
+		<div id="confirmar" class="btn btn-info pull-right">Ready</div>
+		<br/>
+		Pongase ready!
+	</div>
+
+	<!-- dados -->
 	<div id="dados"></div><br/>
-	<select id="jugadas"></select>
-	<div id="jugar" class="btn btn-primary">jugar!</div>
+	<div class="form-inline">
+		<div class="input-append">
+			<select id="jugadas"></select>
+			<div id="jugar" class="btn btn-primary">Pongale</div>
+		</div>
+	</div>
 
 		<div id="messages" class="row">
 			<div id="lines"></div>
