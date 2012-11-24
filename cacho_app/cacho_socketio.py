@@ -70,7 +70,8 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 			# user_sessid de todos los ususarios en la sala.
 			user_session = json.dumps({'user_id': self.request.user.id, 
 												'user_name': self.request.user.username,
-												'confirm': False})
+												'confirm': False,
+												'sessid': self.socket.sessid})
 
 			dados_session = json.dumps({'dados': [0]*5})
 

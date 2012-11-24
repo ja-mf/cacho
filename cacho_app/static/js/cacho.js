@@ -24,16 +24,18 @@ socket.on('turno', function(turno) {
 //	alert(turno);
 	socket.emit('get_dados');
 	if (turno == sessid) {
-		message("server", "mi turno");
+		alert_info("te toca a ti oeh","success");
 		socket.emit('get_jugadas_posibles');
-	} else {
+		$('#input-jugadas').show();		
+	} 
 		$.each(user_list, function (k, v) {
-			$('#'+v['user_name']).removeClass("turno");
+			$('#'+v['user_name']+"-icon").removeClass("icon-star");
 			if (v['sessid'] == turno) {
-				$('#'+v['user_name']).addClass("turno");
+				alert_info("el turno es de "+v['user_name'],"info");
+				$('#'+v['user_name']+"-icon").addClass("icon-star");
 			}
 		});
-	}
+	
 });
 
 socket.on('usuarios_room', function (usernames) {
@@ -41,11 +43,11 @@ socket.on('usuarios_room', function (usernames) {
     $('#userlist').empty();
 //	 alert(JSON.stringify(usernames));
 
-	 $.each(usernames, function(k, v) {
+	 $.each(user_list, function(k, v) {
 		 if (v['confirm']) 
-			$('#userlist').append('<li id="'+ v['user_name'] +'"><i class="icon-ok"></i> '+v['user_name']+'</li>');
+			$('#userlist').append('<li id="'+ v['user_name'] +'">'+v['user_name']+' <i id="'+v['user_name']+'-icon" class="icon-ok"></i></li>');
 		 else
-			$('#userlist').append('<li id="'+ v['user_name'] +'"><i class="icon-remove"></i> '+v['user_name']+'</li>');
+			$('#userlist').append('<li id="'+ v['user_name'] +'">'+v['user_name']+' <i id="'+v['user_name']+'-icon" class="icon-remove"></i></li>');
 	 });
 });
 
@@ -78,9 +80,14 @@ socket.on('revolver_dados', function() {
 });
 
 socket.on('server_message', function (data) {
-	message('server', data);
-	if (data == 'todos_confirmaron')
-		$('#confirmar').hide();
+	alert_info(data, 'info');
+	if (data == 'todos_confirmaron') {
+		$('#confirmar').hide();	
+
+		$.each(user_list, function(k, v) {
+			$('#'+v['user_name']+'-icon').removeClass("icon-ok");
+		});
+	}
 });
 
 socket.on('announcement', function (msg) {
@@ -95,22 +102,28 @@ socket.on('reconnect', function () {
 });
 
 socket.on('reconnecting', function () {
-    message('cacho', 'reconectando al servidor');
+    alert_info('reconectando al servidor','alert');
 });
 
 socket.on('error', function (e) {
-    message('cacho:', e ? e : 'error del servidor!');
+    alert_info(e ? e : 'error del servidor!', 'error');
 });
 
 function message (from, msg) {
     $('#lines').append($('<p>').append($('<b>').text(from), msg));
 }
 
-
+// type=error, succcess, info
+function alert_info(msg, type) {
+	$('#alerts').empty();
+	$('#alerts').addClass("alert-" + type);
+	$('#alerts').append('<h4>' + msg + '</h4>');
+	$('#alerts').show();
+}
 
 $(function () {
     $('#send-message').submit(function () {
-	    message('me', $('#message').val());
+	    message('yo', $('#message').val());
 	    socket.emit('user message', $('#message').val());
 	    clear();
 	    $('#lines').get(0).scrollTop = 10000000;
@@ -127,9 +140,11 @@ $(function () {
 	 });
 
 	 $('#jugar').click(function() {
-		 message('debug',$('#jugadas').val());
+		 var j = $.parseJSON($('#jugadas').val());
+		 message('jugada',  numeros[j[0]] + " " + pintas[j[1]]);
 		 socket.emit('jugada', $('#jugadas').val());
-		socket.emit('user message', $('#jugadas').val());
+		 socket.emit('user message', numeros[j[0]] + " " + pintas[j[1]]);
+		 $('#input-jugadas').hide();
 	 });
 	$('#dudo').click(function () {
 		socket.emit('jugada', '[0,1]');

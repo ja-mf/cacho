@@ -2,8 +2,8 @@
 	padding: 10px;
 }
 
-.turno {
-	background-color: red;
+#input-jugadas {
+	display: none;
 }
 
 #send-message input {
