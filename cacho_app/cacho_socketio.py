@@ -154,7 +154,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 	# enviar dados al usuario que los pidio
 	def on_get_dados(self):
 		# tirar dados?
-		self.emit('dados_user', redisutils.redisdb.get('dados_' + self.socket.sessid))
+		self.emit('dados_user', json.loads(redisutils.redisdb.get('dados_' + self.socket.sessid)))
 		return True
 		
 	# enviar jugadas posibles al usuario que las pidio, n es el numero de dados
@@ -166,6 +166,11 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		else: 
 			self.emit('jugadas_posibles', self.el_dudo.posibles((self.current_play[self.room]), n))
 		
+	def on_revolver(self):	
+		n =json.loads(redisutils.redisdb.get('dados_' + self.socket.sessid))
+		dados = [random.randint(1,6) for i in range(len(n))]
+		redisutils.redisdb.set('dados_' + self.socket.sessid, json.dumps(dados))	
+
 
 	def on_jugada(self, j):
 		# se recibio una jugada:
@@ -198,8 +203,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		
 		
 		n =json.loads(redisutils.redisdb.get('dados_' + self.socket.sessid))
-		self.log(self.current_play[self.room][0])
-		self.log(nreal)
+		self.log(len(n))
 		# es calzo
 		if jugada == (0,0):
 			if (self.current_play[self.room][0] == nreal):
@@ -210,16 +214,19 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 				self.log('resta')
 
 			redisutils.redisdb.set('dados_' + self.socket.sessid, n)
+			self.emit('revolver_dados')
+                        self.emit_to_room(self.room,'revolver_dados')
 			turno = self.turnos[self.room].get_current()
 			self.emit('turno', turno)
 			self.emit_to_room(self.room, 'turno', turno)
-			
 
 		# es dudo
 		elif jugada == (0,1):
 			if (self.current_play[self.room][0] < nreal):
 				n.pop()
 				redisutils.redisdb.set('dados_' + self.socket.sessid, n)
+				self.emit('revolver_dados')
+         	                self.emit_to_room(self.room,'revolver_dados')
 				turno = self.turnos[self.room].get_current()
 				self.emit('turno', turno)
 				self.log('dudo')
@@ -228,9 +235,11 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 				n =json.loads(redisutils.redisdb.get('dados_' + turno))
 				n.pop()
 				redisutils.redisdb.set('dados_' + turno, n)
+				self.emit('revolver_dados')
+        	                self.emit_to_room(self.room,'revolver_dados')
 				self.emit_to_room(self.room, 'turno', turno)
 				self.emit('turno', turno)
-				self.log('not')
+
 				pass
 		else:		# weas pa quitarle un dado al anterior
 			# enviar turno
