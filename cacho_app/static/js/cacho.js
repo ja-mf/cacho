@@ -49,10 +49,12 @@ socket.on('usuarios_room', function (usernames) {
 	 });
 });
 
-socket.on('jugadas_posibles', function(jugadas) {
+socket.on('jugadas_posibles', function(jugadas,not_first) {
 	$('#jugadas').empty();
-	$('#jugadas').append('<option value="[0,0]">Calzo</option>');
-	$('#jugadas').append('<option value="[0,1]">Dudo</option>');
+	if(not_first){
+		$('#jugadas').append('<option value="[0,0]">Calzo</option>');
+		$('#jugadas').append('<option value="[0,1]">Dudo</option>');
+		}
 	$.each(jugadas, function(k, v) {
 		$('#jugadas').append('<option value="['+v[0]+','+v[1]+']">'+numeros[v[0]]+' '+pintas[v[1]]+'</option>');
 	});
@@ -63,6 +65,11 @@ socket.on('dados_user', function(dados) {
 	$.each(dados, function(k, v) {
 		$('#dados').append('<img src="/static/img/die_face_'+v+'.png" /> ');
 	});
+});
+
+socket.on('player_lost', function() {
+	$('#jugadas').empty();
+	$('#dados').empty();
 });
 
 socket.on('revolver_dados', function() {
