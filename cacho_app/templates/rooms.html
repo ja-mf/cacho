@@ -1,9 +1,5 @@
 {% extends "base.html" %}
 
-{% block extra_js %}
-<script>$(showForm);</script>
-{% endblock %}
-
 {% block main %}
 
 <table class="table table-hover">
@@ -26,7 +22,7 @@
 	    </ul>
 	 </td>
 	 <td>
-	 	{% if room.0.state == False %}
+	 	{% if room.0.state %}
 	 	<button class="btn btn-error">Locked</button>
 		{% else %}
 	 	<button class="btn btn-success">Libre</button>
