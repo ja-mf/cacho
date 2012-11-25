@@ -23,6 +23,7 @@ socket.on('user_sessid', function(id) {
 socket.on('turno', function(turno) {
 //	alert(turno);
 	socket.emit('get_dados');
+	socket.emit('check_winner');
 	if (turno == sessid) {
 		alert_info("te toca a ti oeh","success");
 		socket.emit('get_jugadas_posibles');
@@ -72,6 +73,12 @@ socket.on('dados_user', function(dados) {
 socket.on('player_lost', function() {
 	$('#jugadas').empty();
 	$('#dados').empty();
+});
+
+socket.on('winner', function(ganador) {
+	alert_info("El ganador es "+ganador,"info");
+	$('#input-jugadas').hide();
+	$('#salir').show();		
 });
 
 socket.on('revolver_dados', function() {
@@ -148,6 +155,10 @@ $(function () {
 	 });
 	$('#dudo').click(function () {
 		socket.emit('jugada', '[0,1]');
+	});
+	
+	$('#salir').click(function () {
+		location.href="http://localhost:8000/play/";
 	});
 
 	$('#calzo').click(function () {
