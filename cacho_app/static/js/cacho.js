@@ -32,7 +32,7 @@ socket.on('turno', function(turno) {
 		$.each(user_list, function (k, v) {
 			$('#'+v['user_name']+"-icon").removeClass("icon-star");
 			if (v['sessid'] == turno) {
-				alert_info("el turno es de "+v['user_name'],"info");
+				alert_info("El turno es de "+v['user_name'],"info");
 				$('#'+v['user_name']+"-icon").addClass("icon-star");
 			}
 		});
