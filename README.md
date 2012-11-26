@@ -3,12 +3,16 @@ Instalacion
 
 Construir el ambiente:
 
-Dependencias: cython y python-2.7
+Dependencias: cython, python-2.7, redis
 
 	$ git clone git@github.com:jamonardo/cacho.git
 	$ python bootstrap.py
 	$ ./bin/buildout
 	$ ./bin/django syncdb
+
+Iniciar demonio Redis
+
+	$ service redis-server start
 
 Ejecutar servidor:
 

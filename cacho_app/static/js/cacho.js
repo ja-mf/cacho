@@ -194,7 +194,7 @@ $(function () {
 	});
 	
 	$('#salir').click(function () {
-		location.href="http://localhost:8000/play/";
+		location.href="/play/";
 	});
 
 	$('#calzo').click(function () {
