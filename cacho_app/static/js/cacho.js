@@ -29,12 +29,8 @@ socket.on('user_sessid', function(id) {
 // es el sessid del jugador con el turno
 socket.on('turno', function(turno) {
 	socket.emit('get_dados');
-<<<<<<< HEAD
-
 	// es mi turno
-=======
 	socket.emit('check_winner');
->>>>>>> b0e8a36d9c57b1470e888e13ac6f6dd8d8160f1f
 	if (turno == sessid) {
 		alert_info("te toca a ti oeh","success");
 		socket.emit('get_jugadas_posibles');
@@ -97,16 +93,13 @@ socket.on('player_lost', function() {
 	$('#dados').empty();
 });
 
-<<<<<<< HEAD
 // llego el evento revolver_dados
-=======
 socket.on('winner', function(ganador) {
 	alert_info("El ganador es "+ganador,"info");
 	$('#input-jugadas').hide();
 	$('#salir').show();		
 });
 
->>>>>>> b0e8a36d9c57b1470e888e13ac6f6dd8d8160f1f
 socket.on('revolver_dados', function() {
 	socket.emit('revolver');
 	socket.emit("get_dados");
