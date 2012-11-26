@@ -1,0 +1,51 @@
+\subsection{Cliente Javascript}
+La parte del cliente se compone de los templates
+de cada pagina HTML, junto a las hojas de estilo (CSS)
+y scripts JS. Estos archivos se ubican en las carpetas
+\texttt{templates} y \texttt{static} respectivamente. \\
+
+En una sala de juego, se carga la biblioteca Socket.IO
+(\texttt{socket.io.js}), sobre la cual se construiran manipuladores de eventos asincronicos de emisión y recepción de mensajes con el servidor.\\
+
+Al gatillarse estos eventos, irán a producir cambios en el HTML (GUI),
+ocupando la biblioteca JQuery para mayor facilidad.\\
+
+El siguiente codigo muestra la implementacion (reducida) del cliente. Considerar lo siguiente:
+\begin{itemize}
+	\item \texttt{io.connect('/game');} conectará el cliente Socket.IO al \texttt{Namespace}
+	\texttt{game}, definido anteriormente en \texttt{cacho\_socketio.py}
+	\item \texttt{socket.on('connect', function (username) ...} manipulará la llegada del evento
+	\texttt{connect}, con argumento \texttt{username}, luego enviará la peticion a unirse a la sala
+	mediante \texttt{emit}
+	\item \texttt{socket.on('usuarios\_room', ...} manipulará la llegada del evento \texttt{usuarios\_room}, la cual contendrá como argumento a una lista de usuarios con informacion acerca de ellos en JSON.
+	\item En sintesis, el metodo \texttt{emit(event\_name, args)} enviará al servidor el evento \texttt{event\_name},
+	conteniendo como información a \texttt{args}. El metodo \texttt{on(event\_name, callback)} ejecutará
+	la funcion \texttt{callback} (con argumentos si es que posee mensaje) en la llegada del evento \texttt{event\_name}.
+\end{itemize}
+
+\begin{lstlisting}[language=JavaScript, caption=cacho\_app/static/js/cacho.js]
+// socket.io specific code
+// funciones de socket del cliente.
+var socket = io.connect("/game");
+var sessid;
+var user_list;
+
+var numeros = ['ningun', 'un', 'dos', 'tres', 'cuatro', 'cinco',
+					'seis', 'siete', 'ocho', 'nueve', 'diez', 'once',
+					'doce', 'trece', 'catorce', 'quince', 'dieciseis',
+					'diecisiete', 'dieciocho', 'diecinueve', 'veinte']
+var pintas = ['0', 'aces', 'tontos', 'trenes', 'cuartas', 'quintas', 'sextas']
+
+socket.on('connect', function (username) {
+   $('#chat').addClass('connected');
+   socket.emit('join', window.room);
+});
+
+socket.on('user_sessid', function(id) { sessid = id; });
+socket.on('turno', function(turno) { ... });
+socket.on('usuarios_room', function (usernames) { ... });
+...
+\end{lstlisting}
+
+
+

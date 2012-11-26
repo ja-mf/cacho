@@ -24,18 +24,3 @@ class GameRoom(models.Model):
             self.slug = slugify(self.name)
         super(GameRoom, self).save(*args, **kwargs)
 
-class GameUser(models.Model):
-
-	user = models.ForeignKey(User)
-	session = models.CharField(max_length=20)
-	room = models.ForeignKey("cacho_app.GameRoom", related_name="users")
-	confirm = models.BooleanField(default=False)
-	# numero maximo de dados: 5
-	dados = models.CommaSeparatedIntegerField(max_length=5)
-
-	class Meta:
-	    ordering = ("room",)
-	
-	def __unicode__(self):
-	    return self.user.username
-		

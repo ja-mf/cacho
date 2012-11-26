@@ -112,20 +112,18 @@ El juego que implementaremos será el dudo.
 
 \subsection{Resumen}
 
-	El proyecto descrito en este informe será la implementación de
-un juego basado en la  arquitectura cliente-servidor. Este juego será 
-el típico juego latinoamericano de especulación, el dudo.\\
+	El proyecto total consta de 2 partes: el cliente, y el servidor. Una 
+vez tengamos el cliente web, es posible que procedamos a implementarlo para 
+dispositivos móviles. El objetivo que tendremos será hacer que la gente deje
+de jugar típicos juegos de póker, y se cambie a jugar algo mas entretenido y
+cercano como es el dudo.\\
 
-	Éste juego será multijugador, de manera de que puedan jugar múltiples 
-personas en red, ubicadas en distintos lugares físicos, pero compartiendo el
-mismo contexto de la partida. Éstas partidas de desarrollarán en salas de 
-juego independientes unas de otras, y cada una tendrá un ganador. \\
-	
-	Dentro de cada sala habrá un chat para que los usuarios puedan 
-comunicarse entre ellos, libremente.
-	La implementación también ofrecerá un sistema de usuarios. Para jugar
-será necesario registrarse. Por último, la dinámica del juego está regida por 
-reglas detalladas en otra sección dentro de este mismo informe 
+	Otro aspecto importante es que dentro de los requerimientos de diseño
+que nos hemos impuesto, esta el no utilizar Flash, y solo enfocarse en el 
+correcto uso de Javascript y HTML5 para el proecto, acorde a las nuevas 
+corrientes e ideologías de desarrollo de software. Por otra parte, nos 
+enfocaremos en conexiones persistentes, y mensajería asincrónica entre el 
+cliente y el servidor.
 
 \newpage
 \section{Descripción General}
@@ -135,9 +133,10 @@ reglas detalladas en otra sección dentro de este mismo informe
 	El objetivo principal de la aplicacion es ofrecer una plataforma para
 un juego popular chileno, en linea, activo y rapido. La lógica del juego
 es de relativa sencillez y las reglas son ampliamente conocidas, por lo que
-pretende que el juego sea fácil e intuitivo para el usuario.
+pretende que el juego sea fácil e intuitivo para el usuario. Habrán varias
+salas de juego, y el usuario podrá elegir a cual acceder para jugar su partida.
 
- 
+
 \subsubsection{Especificos}
 \begin{itemize}
 	\item Promover el juego del dudo.
@@ -169,10 +168,10 @@ usuarios que estan en cada sala. El cliente entonces podrá elegir una sala
 para jugar su partida, la cual también contará con un chat en el cual 
 participarán los jugadores que compartan una partida.\\
 
-	El servidor se encargará del paso de mensajes asincrónico, y de las
+	El servidor se encargara de el paso de mensajes asincrónico, y de las
 interacciones con la base de datos. Con esto, el servidor definirá la 
 estructura del juego, y su secuencia. Esto se refiere a manejo de turnos, 
-de interacciones entre usuarios, de mensajes de chat, de usuarios dentro de 
+de interacciones "entre usuarios", de mensajes de chat, de usuarios dentro de 
 la sala, de dados disponibles por usuario y su aleatorización, etc.
 	
 
@@ -184,15 +183,9 @@ construido sobre gevent, una biblioteca basadas en co-rutinas para aplicaciones 
 gevent-socketio.\\
 
 En el cliente se utilizará HTML5 y CSS para el diseño, y para la comunicación, Javascript
-con la biblioteca Socket.IO, basada a su vez en node.js.En específico, para 
- la interfaz gráfica, se utilizará Twitter Bootstrap, la cual es una colección
-de herramientas para la creación de diseños web. Contiene platillas HTML y CSS,
-y interacciones con javascript para un diseño eficiente. \\
+con la biblioteca Socket.IO, basada a su vez en node.js.\\
 
-Se posee un repositorio git para el control de versiones, hospedado en 
-github.com. Este informe también se encuentra disponible en el repositorio.
-Se puede acceder a él mediante el código QR disponible en la portada del 
-informe, o accediendo a https://github.com/jamonardo/cacho.
+Se posee un repositorio git para el control de versiones, hospedado en github.com
 
 \newpage
 \section{Especificación de los requerimientos}
@@ -202,7 +195,7 @@ las reglas del juego.
 
 \subsection{Reglas del juego}
 
-	El juego parte cuando hay más de un jugador listo para comenzar.
+	El juego parte cuando hay mas de dos jugadores listos para comenzar.
  Cada jugador parte con un total de 5 dados dentro de su \textit{cacho}. Las 
 rondas del juego se realizan en sentido antihorario.\\
 
@@ -216,7 +209,7 @@ obtenidos en total por todos los jugadores. Los ases, aparte de ser números
 concretos, con comodines, y pueden obtener el valor del número que se esta 
 contando.\\
 
-	El jugador que parte \textit{canta} un número estimado de dados. 
+	El jugador que parte \textit{canta} un numero estimado de dados. 
 \textbf{(ej: "Hay tres quinas")}. \\
 
 	El jugador siguiente tiene dos opciones: elevar el número especulado,
@@ -224,8 +217,7 @@ o dudar. \\
 
 \begin{itemize}
 \item Para elevar el número, existen tres maneras posibles. Una es aumentar la 
-\textit{"pinta"} del dado (ej: De tres quinas a tres sextas). Otra es aumentar
- el número de dados totales en la especulación (ej: De tres quinas a cuatro 
+\textit{"pinta"} del dado (ej: De tres quinas a tres sextas). Otra es aumentar el numero de dados totales en la especulación (ej: De tres quinas a cuatro 
 quinas). La última manera es una combinación de las dos maneras anteriores.
 \item Si el jugador duda, todos los jugadores muestran los dados contenidos
 en sus cachos, y estos se cuentan. Si la especulación era correcta, es decir,
@@ -279,14 +271,6 @@ y es él quien gana.\\
 	todos los jugadores dentro de una sala para comenzar la partida.
 	\item[Requisito 7] \hfill \\ \\
 	Implementación de lógica de juego del lado del servidor.
-	\item[Requisito 8] \hfill \\ \\
-	Display con dados disponibles por usuario, y dados obtenidos en cada 
-	turno.
-	\item[Requisito 9] \hfill \\ \\
-	Determinar el ganador de la partida, y boton de salida de la sala
-	dinámico, el cual aparece una vez que la partida termine.
-	\item[Requisito 10] \hfill \\ \\
-	Display que diga quien está jugando actualmente.
 \end{description}
 %\newpage
 
@@ -296,27 +280,17 @@ y es él quien gana.\\
 	\item[Sencillez de uso] \hfill \\ \\
 	El uso del sistema y de sus componentes debe ser intuitivo, lo mas 
 	sencillo posible. Las opciones para el usuario deben estar acordes
-	a estos principios.
-	Para esto, se diseñará la interfaz gráfica de la manera mas sencilla
-	que se pueda, no utilizando interacciones complejas, y haciendo
-	que las opciones disponibles lo más evidentes y sencillas posibles. 
+	a estos principios. 
 	\item[Fluidez] \hfill \\ \\
-	Por otra parte, el juego debe funcionar lo más fluidamente posible.
+	Por otra parte, el juego debe funcionar lo mas fluidamente posible.
 	Esto significa que toda la interacción del usuario, desde su login, 
 	mientras dure la partida y su finalización, deben transcurrir dentro 
 	de lo posible sin retardos ni cortes.
-	Para esto, se utilizará gevent-socketio, enfatizando que las 
-	interacciones con dependencia de otros componentes
-	sean lo más breves posibles, de manera que los tiempos de respuesta
-	sean mínimos. 
 	\item[Escalabilidad] \hfill \\ \\
 	El sistema debe ser modular en su construcción, permitiendo así 
 	añadir futuras funcionalidades al juego que puedan mejorar su
 	calidad. Es importante que se pueda hacer esto sin afectar la 
 	codificación hecha anteriormente.
-	Para esto, se diseñará modularmente, haciendo que cada parte del código
-	sea un módulo, y permitiendo la posibilidad de integrar varios más
-	en el caso de que se desee agregar mas componentes.
 
 \end{description}
 \newpage
@@ -336,8 +310,7 @@ y es él quien gana.\\
 	ingresarán a el juego, logeandose. Luego buscarán una sala disponible.
 	Al ingresar a una sala disponible, podrán salirse de ella, o confirmar
 	su participación para el inicio del juego. Una vez terminada la partida,
-	el usuario se sale de la sala, y vuelve a escoger otra sala disponible
-	para jugar, o derechamente se sale del sistema.
+	el usuario puede elegir entre jugar otra partida, o salirse del sistema.
 	
 \end{description}
 \newpage
@@ -375,7 +348,6 @@ Las funciones del sistema serán:\\
 	\item Confirmar el inicio del juego por parte de un usuario.
 	\item Recibir y mostrar los dados para el jugador
 	\item Enviar una jugada, un dudo o calzo.
-	\item Salir de la sala una vez terminada la partida.
 \end{itemize}
 \newpage
 
@@ -387,28 +359,28 @@ Las funciones del sistema serán:\\
 \end{figure}
 \newpage
 
-\subsection{Vistas}
+\subsection{Prototipos de pantalla}
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.9\textwidth]{Login.png}
+	\includegraphics[width=0.7\textwidth]{Login.png}
 	\caption{Login}
 \end{figure}
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.9\textwidth]{Sign_in.png}
+	\includegraphics[width=0.7\textwidth]{Sign_in.png}
 	\caption{Sign in}
 \end{figure}
 \newpage
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.9\textwidth]{Sala.png}
+	\includegraphics[width=0.7\textwidth]{Sala.png}
 	\caption{Sala de juego}
 \end{figure}
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.9\textwidth]{salas.png}
+	\includegraphics[width=0.7\textwidth]{salas.png}
 	\caption{Lista de salas de juego}
 \end{figure}
 \newpage
@@ -485,7 +457,11 @@ interacciones que tienen cada uno de ellos con el sistema.
 \end{figure}
 
 \subsubsection{Modelo de datos}
-El modelo de datos se adjunta en el apendice. Solo fué necesaria la creacion de \texttt{GameRoom}
+Se definieron dos modelos de datos GameRoom y GameUser. User lo provee Django.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{md.png}
+\end{figure}
 
 \newpage
 \subsubsection{Diagrama de secuencia}
@@ -496,12 +472,6 @@ y el significado de cada mensaje.
 	\centering
 	\includegraphics[width=\textwidth]{seq_juego.png}
 \end{figure}
-
-\subsubsection{Diagrama de flujo de la lógica del juego}
-El diagrama de flujo adjunto en el apendice muestra como se desarrolla el juego una vez
-que a un jugador le llega un turno. Esto se ejecuta desde el inicio por cada
-turno jugado.
-
 \newpage
 \section{Implementación}
 \subsection{Descripción de componentes}
@@ -511,7 +481,7 @@ Actualmente, el servidor consta de un proyecto de Django, el cual tiene dos apli
 \texttt{cacho\_site} pretende tener objetos y sistemas
 relacionados con el sitio entero, se compone de los siguientes modulos:\\
 
-\textbf{urls.py:} Derivará una URL hacia una vista o módulo.
+\textbf{urls.py:} Derivará una URL hacia una vista o modulo.
 En el caso de \texttt{/socket.io}, lo derivará al Namespace especifico
 al cual se quiere conectar. Al ingresar a \texttt{/play/} se cargarán las URL
 de la aplicación \texttt{cacho\_app}.
@@ -547,8 +517,8 @@ def logout_view(request):
 
 \newpage
 \subsection{Aplicación del juego}
-\texttt{cacho\_app} pretende mantener objetos y módulos relacionados solo
-con la aplicación de juego, usando las sesiones y modelos de \texttt{cacho\_site}.\\
+\texttt{cacho\_app} pretende mantener objetos y modulos relacionados solo
+con la aplicacion de juego, usando las sesiones y modelos de \texttt{cacho\_site}.\\
 
 Se compone de los siguientes modulos:\\
 
@@ -629,7 +599,7 @@ class Dudo:
 \end{lstlisting}
 
 \newpage
-\textbf{cacho\_socketio.py}: A este módulo llegarán las conexiones y mensajes que 
+\textbf{cacho\_socketio.py}: A este modulo llegarán las conexiones y mensajes que 
 provienen del cliente Javascript. Según el protocolo de Socket.IO, el cliente 
 se debe conectar a un Namespace, un espacio de nombres especifico que mantiene 
 un conjunto de funciones. En este caso, se definió el namespace 
@@ -645,7 +615,7 @@ Un mensaje/evento se compone de un nombre y sus datos, los cuales serán seriali
 para su posterior entendimiento en el cliente Javascript. Un metodo del Namespace es el nombre de un evento, precedido por \textbf{on\_}. e.g: el mensaje enviado desde 
 el cliente \texttt{('join', room)}, gatillará el evento \texttt{on\_join(self, room\_in)}, donde el argumento será su dato. Este dato como se dijo, puede ser cualquier objeto notado en JSON.\\
 
-Este Namespace hereda metodos y variables que son útiles para la comunicacion: 
+Este Namespace hereda metodos y variables que son utiles para la comunicacion: 
 \texttt{emit()}, \texttt{emit\_to\_room()}, \texttt{socket.sessid}, por ejemplo. Para una completa lista revisar la API de referencia \footnote{\texttt{https://gevent-socketio.readthedocs.org/en/latest/namespace.html}}
 
 \begin{lstlisting}[caption=cacho\_app/cacho\_socketio.py]
@@ -705,56 +675,45 @@ class GameRoom(models.Model):
             self.slug = slugify(self.name)
         super(GameRoom, self).save(*args, **kwargs)
 
+class GameUser(models.Model):
+
+   user = models.ForeignKey(User)
+   session = models.CharField(max_length=20)
+   room = models.ForeignKey("cacho_app.GameRoom", related_name="users")
+   confirm = models.BooleanField(default=False)
+
+	class Meta:
+       ordering = ("room",)
+   
+   def __unicode__(self):
+       return self.user.username
+
 \end{lstlisting}
 
 \newpage
+
 \input{cliente.tex}
+
 \newpage
+
 \section{Conclusiones}
 
-	Al finalizar el desarrollo de la aplicación, se ha concluido que:
+	Al final de esta etapa de desarrollo, hemos concluido que:
 
 \begin{itemize}
-	\item Las funcionalidades del servidor están completas a cabalidad.
-	El cliente es completamente funcional al momento de la entrega.
-	Se puede seguir escalando su funcionamiento, para aplicar distintas
-	opciones, pero para efectos del trabajo asignado, esta terminado.
-	\item Diseñar un juego es un proceso muy complicado, y muy extenso.
-	La cantidad de componentes que se le pueden agregar son innumerables,
-	por lo que es vital programar dejando espacio para futuras 
-	modificaciones, mejoras, y elementos nuevos. La escalabilidad es
-	necesaria completamente. 
-	\item Es muy importante para este tipo de desarrollo el proceso 
-	de testing. Dado que es un juego, existen muchísimas interacciones 
-	distintas entre los jugadores, dando lugar a muchas instancias que 
-	pueden no haber sido previstas por los programadores. En éstas, pueden 
-	ocurrir errores, o "bugs", que alteren el curso normal del juego.
-	El proceso debe realizarse con el fin de encontrar la mayor cantidad
-	de errores posibles antes de sacar al producto de la fase de desarrollo.
- 	\item El modelo MVC es muy útil y eficiente a la hora de realizar
+	\item Las funcionalidades del servidor estan completas casi a cabalidad.
+	Faltará adaptarlas un poco al momento de desarrollar el cliente, y
+	quizás agregar alguna modificación o funcionalidad.
+	\item Es posible que cambiemos el tipo de interacción con la base de
+	datos, para disminuir el número de consultas totales realizadas.
+	Esto se verá en el camino, pero existe una gran posibilidad.
+	\item El modelo MVC es muy útil y eficiente a la hora de realizar
 	aplicaciones con paso de mensajes asincrónicos, ya que para efectos
 	de visualización por parte del cliente, las vistas se actualizan 
 	al haber un cambio en el modelo. Resulta muy natural.
 
 \end{itemize}
-\newpage 
-\appendix
-\section{Figuras}
 
-\begin{figure}[h!]
-\caption{Diagrama de flujo del juego}
-\includegraphics[width=\textwidth]{FlujoDudo.png}
-\end{figure}
-
-\newpage
-\begin{figure}[h!]
-	\centering
-		\caption{Modelo de datos}
-	\includegraphics[width=\textwidth]{md.png}
-\end{figure}
-
-
-\newpage
 \section{Referencias}
 \begin{enumerate}
 	\item Documentación oficial de Django -- https://docs.djangoproject.com/en/1.4/

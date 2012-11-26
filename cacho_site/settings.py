@@ -62,7 +62,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 	 'cacho_site',
     'cacho_app',
-#	 'debug_toolbar',
+	 'django_extensions',
 )
 
 LOGGING = {
