@@ -29,8 +29,12 @@ socket.on('user_sessid', function(id) {
 // es el sessid del jugador con el turno
 socket.on('turno', function(turno) {
 	socket.emit('get_dados');
+<<<<<<< HEAD
 
 	// es mi turno
+=======
+	socket.emit('check_winner');
+>>>>>>> b0e8a36d9c57b1470e888e13ac6f6dd8d8160f1f
 	if (turno == sessid) {
 		alert_info("te toca a ti oeh","success");
 		socket.emit('get_jugadas_posibles');
@@ -41,7 +45,7 @@ socket.on('turno', function(turno) {
 		$.each(user_list, function (k, v) {
 			$('#'+v['user_name']+"-icon").removeClass("icon-star");
 			if (v['sessid'] == turno) {
-				alert_info("el turno es de "+v['user_name'],"info");
+				alert_info("El turno es de "+v['user_name'],"info");
 				$('#'+v['user_name']+"-icon").addClass("icon-star");
 			}
 		});
@@ -93,7 +97,16 @@ socket.on('player_lost', function() {
 	$('#dados').empty();
 });
 
+<<<<<<< HEAD
 // llego el evento revolver_dados
+=======
+socket.on('winner', function(ganador) {
+	alert_info("El ganador es "+ganador,"info");
+	$('#input-jugadas').hide();
+	$('#salir').show();		
+});
+
+>>>>>>> b0e8a36d9c57b1470e888e13ac6f6dd8d8160f1f
 socket.on('revolver_dados', function() {
 	socket.emit('revolver');
 	socket.emit("get_dados");
@@ -185,6 +198,10 @@ $(function () {
 	
 	$('#dudo').click(function () {
 		socket.emit('jugada', '[0,1]');
+	});
+	
+	$('#salir').click(function () {
+		location.href="http://localhost:8000/play/";
 	});
 
 	$('#calzo').click(function () {

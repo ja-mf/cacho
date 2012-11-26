@@ -31,6 +31,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 	actualdados = {}
 	firstplay = {}
 	current_play = {}
+	ganador = {}
 	
 	def initialize(self): 
 		self.logger = logging.getLogger("socketio.chat")
@@ -148,6 +149,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 #		self.emit('usuarios_room', users)
 
 		self.firstplay[self.room] = 1
+		self.ganador[self.room] = 0
 		turno = self.turnos[self.room].get()
 		self.emit_to_room(self.room, 'turno', turno)
 		self.emit('turno', turno)
@@ -159,9 +161,15 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		return True
 		
 	# enviar jugadas posibles al usuario que las pidio, n es el numero de dados
-	#def on_check_winner(self):
-	#	if(len(self.turnos[self.room]==1):
-	#		self.emit			
+	def on_check_winner(self):
+		self.log(self.turnos[self.room].length())
+		if(self.ganador[self.room]==0):
+			if(self.turnos[self.room].length()==1):
+				self.emit('winner', self.username)
+				self.emit_to_room(self.room, 'winner', self.username)
+				self.log(self.socket.sessid)
+				self.ganador[self.room]=1
+					
 	
 	def on_get_jugadas_posibles(self):
 		n = self.actualdados[self.room]
@@ -234,23 +242,40 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 
 		# es dudo
 		elif jugada == (0,1):
-			if (self.current_play[self.room][0] < nreal):
+			if (self.current_play[self.room][0] < nreal+1):
 				n.pop()
 				redisutils.redisdb.set('dados_' + self.socket.sessid, n)
-				self.emit('revolver_dados')
-         	                self.emit_to_room(self.room,'revolver_dados')
-				turno = self.turnos[self.room].get_current()
-				self.emit('turno', turno)
-				self.log('dudo')
+				if (len(n)==0):
+					self.emit('player_lost')
+					turno = self.turnos[self.room].get()
+					self.firstplay[self.room] = 1
+					self.emit('turno',turno)
+					self.emit_to_room(self.room, 'turno', turno)
+					self.turnos[self.room].remove(self.socket.sessid)
+				else:
+					self.emit('revolver_dados')
+         		                self.emit_to_room(self.room,'revolver_dados')
+					turno = self.turnos[self.room].get_current()
+					self.emit('turno', turno)
+					self.log('dudo')
 			else:
+				curr = self.turnos[self.room].get_current()
 				turno = self.turnos[self.room].previous() 
 				n =json.loads(redisutils.redisdb.get('dados_' + turno))
 				n.pop()
 				redisutils.redisdb.set('dados_' + turno, n)
-				self.emit('revolver_dados')
-        	                self.emit_to_room(self.room,'revolver_dados')
-				self.emit_to_room(self.room, 'turno', turno)
-				self.emit('turno', turno)	
+				if (len(n)==0):
+					self.turnos[self.room].remove(turno)
+					#self.emit('player_lost')
+					self.firstplay[self.room] = 1
+					self.emit('turno',curr)
+					self.emit_to_room(self.room, 'turno', curr)
+
+				else:	
+					self.emit('revolver_dados')
+	        	                self.emit_to_room(self.room,'revolver_dados')
+					self.emit_to_room(self.room, 'turno', turno)
+					self.emit('turno', turno)	
 			self.current_play[self.room] = (0,6)
 			self.firstplay[self.room] = 1
 

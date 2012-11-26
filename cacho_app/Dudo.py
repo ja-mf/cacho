@@ -2,6 +2,10 @@ class RingBuffer:
 	def __init__(self):
 		self.data = []
 		self.cur=0
+	def remove(self, key):
+		self.data.remove(key)
+	def length(self):
+		return len(self.data)
 	def append(self,x):
 		"""append an element at the end of the buffer"""
 		self.data.append(x)

@@ -6,6 +6,10 @@
 	display: none;
 }
 
+#salir {
+	display: none;
+}
+
 #send-message input {
 	border-color: 1px solid black;
 	width: 380px;
