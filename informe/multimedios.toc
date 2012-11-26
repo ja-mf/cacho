@@ -25,8 +25,9 @@
 \contentsline {subsection}{\numberline {5.2}Dise\IeC {\~n}o l\IeC {\'o}gico}{17}
 \contentsline {subsubsection}{\numberline {5.2.1}Diagrama de casos de uso}{17}
 \contentsline {subsubsection}{\numberline {5.2.2}Modelo de datos}{17}
-\contentsline {subsubsection}{\numberline {5.2.3}Diagrama de secuencia}{18}
-\contentsline {subsubsection}{\numberline {5.2.4}Diagrama de flujo de la l\IeC {\'o}gica del juego}{18}
+\contentsline {subsubsection}{\numberline {5.2.3}Diagrama de clases}{17}
+\contentsline {subsubsection}{\numberline {5.2.4}Diagrama de secuencia}{18}
+\contentsline {subsubsection}{\numberline {5.2.5}Diagrama de flujo de la l\IeC {\'o}gica del juego}{18}
 \contentsline {section}{\numberline {6}Implementaci\IeC {\'o}n}{19}
 \contentsline {subsection}{\numberline {6.1}Descripci\IeC {\'o}n de componentes}{19}
 \contentsline {subsection}{\numberline {6.2}Aplicaci\IeC {\'o}n del juego}{20}
