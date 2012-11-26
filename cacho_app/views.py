@@ -31,8 +31,8 @@ def room(request, slug, template="room.html"):
 	"""
 	Entrar a una sala de juego
 	"""
-	logged_user = request.user.get_full_name()
-	context = {"room": get_object_or_404(GameRoom, slug=slug), "user": logged_user}
+#	logged_user = request.user.get_full_name()
+	context = {"room": get_object_or_404(GameRoom, slug=slug)}
 	return render(request, template, context)
 
 def create(request):

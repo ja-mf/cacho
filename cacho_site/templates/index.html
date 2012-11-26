@@ -1,5 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Dudo! - Home{% endblock %}
 
+{% block extra_css %}
+<link href='http://fonts.googleapis.com/css?family=Cutive+Mono' rel='stylesheet' type='text/css'>
+<style>
+.hero-unit h1 {
+	font-family: 'Cutive Mono', cursive;
+	font-size:24pt;
+}
+
+</style>
+{% endblock %}
+
+
 {% block main %}
+	<img src="{{ STATIC_URL }}img/cacho-up.png" />
 {% endblock %}

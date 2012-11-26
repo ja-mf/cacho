@@ -4,8 +4,7 @@ from socketio.namespace import BaseNamespace
 from socketio.mixins import RoomsMixin, BroadcastMixin
 from socketio.sdjango import namespace
 
-from cacho_app.models import GameUser, GameRoom
-
+from cacho_app.models import GameRoom
 from django.http import HttpResponse
 from Dudo import Dudo, RingBuffer
 
@@ -134,9 +133,11 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		for c in users:
 			if c['confirm'] == False:
 				return True
+
 		r = GameRoom.objects.get(id=self.room)	
 		r.state = True
 		r.save()
+
 		self.emit_to_room(self.room, 'server_message', 'todos_confirmaron')
 		self.emit('server_message', 'todos_confirmaron')
 

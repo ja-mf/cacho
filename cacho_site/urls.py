@@ -17,8 +17,9 @@ urlpatterns = patterns('',
 
 urlpatterns += patterns('cacho_site.views', 
 	# login logout
-	url(r'^logout/', 'logout_view'),
-	url(r'^register/', 'new_user'),
+	url(r'^logout', 'logout_view'),
+	url(r'^register', 'new_user'),
+	url(r'^reglas', 'rules'),
 
 	# urls de la app.
 	url(r'^hello', 'hello'),

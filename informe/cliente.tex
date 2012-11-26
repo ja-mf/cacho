@@ -5,10 +5,10 @@ y scripts JS. Estos archivos se ubican en las carpetas
 \texttt{templates} y \texttt{static} respectivamente. \\
 
 En una sala de juego, se carga la biblioteca Socket.IO
-(\texttt{socket.io.js}), sobre la cual se construiran manipuladores de eventos asincronicos de emisión y recepción de mensajes con el servidor.\\
+(\texttt{socket.io.js}), sobre la cual se construirán manipuladores de eventos asincronicos de emisión y recepción de mensajes con el servidor.\\
 
-Al gatillarse estos eventos, irán a producir cambios en el HTML (GUI),
-ocupando la biblioteca JQuery para mayor facilidad.\\
+Al gatillarse estos eventos, irán a producir cambios en el HTML (DOM, GUI),
+ayudandonos con la biblioteca JQuery.\\
 
 El siguiente codigo muestra la implementacion (reducida) del cliente. Considerar lo siguiente:
 \begin{itemize}
@@ -46,6 +46,7 @@ socket.on('turno', function(turno) { ... });
 socket.on('usuarios_room', function (usernames) { ... });
 ...
 \end{lstlisting}
+
 
 
 

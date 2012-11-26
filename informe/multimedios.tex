@@ -181,7 +181,7 @@ Para la parte del servidor, constará de una aplicacion MVC, utilizando el frame
 Django (Python). Con el fin de tener una comunicación asincronica y activa entre
 el cliente y el servidor, se utilizará un binding de la biblioteca Socket.IO (Javascript),
 construido sobre gevent, una biblioteca basadas en co-rutinas para aplicaciones de red, llamado
-gevent-socketio.\\
+gevent-socketio. Como Key-value store se utilizó la base de datos NoSQL Redis\\
 
 En el cliente se utilizará HTML5 y CSS para el diseño, y para la comunicación, Javascript
 con la biblioteca Socket.IO, basada a su vez en node.js.En específico, para 
@@ -508,7 +508,7 @@ turno jugado.
 Actualmente, el servidor consta de un proyecto de Django, el cual tiene dos aplicaciones,
 \texttt{cacho\_site} y \texttt{cacho\_app}.\\
 
-\texttt{cacho\_site} pretende tener objetos y sistemas
+\texttt{cacho\_site} contiene objetos y sistemas
 relacionados con el sitio entero, se compone de los siguientes modulos:\\
 
 \textbf{urls.py:} Derivará una URL hacia una vista o módulo.
@@ -537,12 +537,8 @@ Django (\texttt{django.contrib.auth}), un filtro para usar el metodo que le sigu
 \begin{lstlisting}[language=Python, caption=cacho\_site/views.py]
 @login_required
 def index(request):
-	return HttpResponse('this is index. welcome ' + request.user.get_full_name())
-
-def logout_view(request):
-	logout(request)
-	HttpResponse("Logged out!")
-	return HttpResponseRedirect('/login/')
+	context = {"user": request.user}
+	return render(request, 'index.html', context)
 \end{lstlisting}
 
 \newpage
@@ -594,46 +590,40 @@ los movimientos (2-tuplas) que son posibles de realizar (y que van con las regla
 \begin{lstlisting}[caption=Dudo.py]
 class RingBuffer:
 	def __init__(self):
-		self.data = []
-		self.cur=0
+		pass
+		
+	def remove(self, key):
+		pass
+		
+	def length(self):
+		pass
+		
 	def append(self,x):
-		"""append an element at the end of the buffer"""
-		self.data.append(x)
+		pass
+		
 	def get(self):
-		self.cur+=1
-		if len(self.data) == self.cur:
-			self.cur=0 	
-		return self.data[self.cur]
-
+		pass
+		
+	def get_current(self):
+		pass
+		
+	def previous(self):
+		pass
+		
+	def set(self, x):
+		pass
+		
 class Dudo:
 	def posibles(self, movimiento, maximo_dados):
-		movimientos_posibles = []
-		pinta = 0
-		if movimiento[1] != 1:
-			for i in range (movimiento[0], maximo_dados+1):
-				if pinta == 0:
-					movimientos_posibles.append(((movimiento[0]/2)+1,1))
-					for j in range (movimiento[1]+1, 7):
-						movimientos_posibles.append((i,j))
-					pinta = 1
-				else:
-					for j in range (1,7):
-						movimientos_posibles.append((i,j))
-		else:
-			for i in range (movimiento[0]+1, maximo_dados+1):
-				movimientos_posibles.append((i,1))
-			for i in range (movimiento[0]*2, maximo_dados+1):
-				for j in range (2, 7):
-					movimientos_posibles.append((i,j))
-		return movimientos_posibles
+		pass
 \end{lstlisting}
 
 \newpage
 \textbf{cacho\_socketio.py}: A este módulo llegarán las conexiones y mensajes que 
 provienen del cliente Javascript. Según el protocolo de Socket.IO, el cliente 
 se debe conectar a un Namespace, un espacio de nombres especifico que mantiene 
-un conjunto de funciones. En este caso, se definió el namespace 
-\texttt{/game}, el cual agrupa funciones referentes al juego. \\
+un conjunto de funciones (event handlers). En este caso, se definió el namespace 
+\texttt{/game}, el cual agrupa eventos referentes al juego. \\
 
 Cada petición \texttt{HTTP GET} será una instancia de esta clase (GameNamespace), por lo tanto
 manejará la interacción con un solo cliente logeado. Cada una de estas funciones se ejecutará
@@ -672,7 +662,48 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 
 	def on_jugada(self, jugada):
 		pass
+		
+	...
+\end{lstlisting}
+\newpage
+\subsubsection{NoSQL Redis}
+Para el almacenamiento de datos de una partida (dados y usuarios actuales en una partida) se usó una base de datos Redis\footnote{http://redis.io/} (NoSQL),
+el cual almacena en la memoria ram un par de datos (Key-value store).\\
 
+Redis provee comandos para setear y obtener una campo segun su key, los campos utilizados acá fueron strings serializados en JSON, con
+el fin de guardar información formateada. Mas información acerca del formato se puede encontrar en los comentarios de
+\texttt{cacho\_socketio.py}, método \texttt{on\_join}.\\
+
+\texttt{redis-py}\footnote{https://github.com/andymccurdy/redis-py} es un cliente para Python para los comandos de Redis.
+Se implementó el modulo \texttt{redisutils.py}, el cual inicia la conexion al servidor de Redis y contiene funciones útiles para
+varios metodos/modulos.
+
+\begin{lstlisting}[caption=cacho\_app/redisutils.py]
+redisdb = redis.StrictRedis(host='localhost', port=6379, db=0)
+
+def get_members_info(room):
+	members = []
+	room_members = list(redisdb.smembers('room_' + room))
+
+	for sessid in room_members:
+		members.append(json.loads(redisdb.get('user_' + sessid)))
+
+	return members
+
+def get_members(room):
+	return len(redisdb.smembers('room_' + str(room)))
+
+def get_members_name(room):
+	members = []
+	if get_members(room) == 0:
+		return members
+		
+	room_members = list(redisdb.smembers('room_' + str(room)))
+	
+	for sessid in room_members:
+		members.append(json.loads(redisdb.get('user_' + sessid))['user_name'])
+	
+	return members
 \end{lstlisting}
 \newpage
 \subsubsection{Modelo de datos}
@@ -680,8 +711,6 @@ El modelo de datos se definió en models.py como sigue. La funcion \texttt{slugi
 que puede contener espacios y otros caracteres en un string que puede ser concatenado a una URL, ese será
 el metodo de acceso a una sala.\\
 
-La tabla \texttt{GameUser} mantendrá los usuarios que estan actualmente en las salas de juego,
-donde session pertenece al \texttt{session\_id} de la sesión iniciada por Socket.IO.
 
 \begin{lstlisting}[caption=cacho\_app/models.py]
 class GameRoom(models.Model):
@@ -709,7 +738,11 @@ class GameRoom(models.Model):
 
 \newpage
 \input{cliente.tex}
-\newpage
+\subsection{Notas}
+\begin{itemize}
+	\item Se usó como base el framework Bootstrap\footnote{http://twitter.github.com/bootstrap/}
+	\item Más información técnica acerca de la implementación puede ser encontrada en los comentarios del codigo.
+\end{itemize}
 \section{Conclusiones}
 
 	Al finalizar el desarrollo de la aplicación, se ha concluido que:

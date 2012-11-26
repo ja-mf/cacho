@@ -30,8 +30,10 @@
 \contentsline {section}{\numberline {6}Implementaci\IeC {\'o}n}{19}
 \contentsline {subsection}{\numberline {6.1}Descripci\IeC {\'o}n de componentes}{19}
 \contentsline {subsection}{\numberline {6.2}Aplicaci\IeC {\'o}n del juego}{20}
-\contentsline {subsubsection}{\numberline {6.2.1}Modelo de datos}{23}
-\contentsline {subsection}{\numberline {6.3}Cliente Javascript}{24}
-\contentsline {section}{\numberline {7}Conclusiones}{25}
-\contentsline {section}{\numberline {A}Figuras}{26}
-\contentsline {section}{\numberline {B}Referencias}{28}
+\contentsline {subsubsection}{\numberline {6.2.1}NoSQL Redis}{23}
+\contentsline {subsubsection}{\numberline {6.2.2}Modelo de datos}{24}
+\contentsline {subsection}{\numberline {6.3}Cliente Javascript}{25}
+\contentsline {subsection}{\numberline {6.4}Notas}{26}
+\contentsline {section}{\numberline {7}Conclusiones}{26}
+\contentsline {section}{\numberline {A}Figuras}{27}
+\contentsline {section}{\numberline {B}Referencias}{29}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Dudo! - Home{% endblock %}
+
+{% block main %}
+
+      <h1>Reglas del Dudo</h1>
+      <p>Pueden jugar 2 o más jugadores.  El objetivo del juego es ser el último jugador con dados en la mesa.</p>
+      <p>Se comienza juego con 5 dados. Cada jugador tira un dado, y el mayor parte el juego. Si uno de los dados está montado, se debe decir "Montado", mostrar los dados, y proceder con un nuevo tiro de los dados.<br>
+      </p>
+      <h2>Terminología:</h2>
+      
+      <ul>
+        <li>1 =&gt; Aces <br>
+        </li>
+        <li>2 =&gt; Tontos <br>
+        </li>
+        <li>3 =&gt; Trenes <br>
+        </li>
+        <li>4 =&gt; Cuadras <br>
+        </li>
+        <li>5 =&gt; Quinas <br>
+        </li>
+        <li>6 =&gt; Sextas <br>
+        </li>
+      </ul>
+      <br>
+      <h2>Cómo se manejan los aces (comodines):</h2>
+      <ul>
+        <li>Si se quiere reducir la actual pinta (no aces) a aces, se debe reducir a la mitad, con la parte fraccionaria redondeada hacia arriba. (Ej. 7 sextas =&gt; 4 aces; 8 Quinas =&gt; 4 aces)<br>
+        </li>
+        <li>Si se quiere cambiar de aces a cualquier pinta, se debe multiplicar la cantidad de aces por dos y sumar uno. Este será el nuevo número de la pinta por ser elegida. (Ej. 4 aces =&gt; 9 Trenes)<br>
+        </li>
+      </ul>
+      <br>
+      <h2>Cómo se pierde un dado:</h2>
+      
+      <ul>
+        <li>Al ser dudado con razón.<br>
+        </li>
+        <li>Al dudar sin razón.<br>
+        </li>
+        <li>Al Calzar sin razón.<br>
+        </li>
+        <li>Al hacer Trampa.</li>
+      </ul>
+      <p>&nbsp;</p>
+      <p>Al perder todos los dados personales, se termina su participación en el juego actual. El que perdió/ganó dado en última vuelta parte la siguiente vuelta en cualquier dirección.Al calzar acertadamente se gana un dado. No existe límite en la cantidad de dados que una persona puede llegar a tener en un juego. Se puede usar sicología durante un juego. (Hablar a los otros jugadores, comentar jugadas, proyectar jugadas etc...)<br>
+      </p>
+      <br>
+      <h2>Cómo y cuándo se obliga:</h2>
+      <ul>
+        <li>Se obliga cuando uno queda con un dado.<br>
+        </li>
+        <li>Se puede obligar cuantas veces se queda con un dado.<br>
+        </li>
+        <li>Se puede obligar siempre, incluso cuando hay solo dos jugadores y sin importar la cantidad de dados restantes.<br>
+        </li>
+        <li>Existen dos formas de obligar :</li>
+        
+      </ul>
+      <ul><ul>
+        <li><em>Obligar abierto</em>: Todos los jugadores ven los cachos de los demás, pero no el propio. Luego el Obligador realiza la apuesta de forma normal.<br>
+        </li>
+        <li><em>Obligar cerrado</em>: Nadie ve sus dados ni los dados de nadie. El Obligador apuesta a X de lo que él tiene. Se continúa apostando o dudando en base a lo que supuestamente el Obligador tiene.<br>
+        </li>
+      </ul></ul>
+      <ul>
+        <li>En el obligar se puede dudar y calzar. Igual que un juego normal. <br>
+        </li>
+        <li>En el obligar se debe seguir la pinta inicial. No se puede cambiar la pinta, o reducir a aces.<br>
+        </li>
+      </ul>
+      <br>
+      
+        <h2>Cuándo se pasa:</h2>
+      
+      <ul>
+        <li>Se puede pasar cuando uno tiene todas los dados iguales.<br>
+        </li>
+        <li>Se puede pasar cuando uno tiene todos los dados distintos.<br>
+        </li>
+        <li>Se puede pasar cuando uno tiene un full.<br>
+        </li>
+      </ul>
+      <br>
+      
+        <h2>Otros Datos sobre el paso:</h2>
+      
+      <ul>
+        <li>Se puede pasar solamente una vez por tirada de Dados.<br>
+        </li>
+        <li>Si pueden pasar dos personas seguidas.<br>
+        </li>
+        <li>Uno puede seguir el juego, dudar el paso o calzar el valor anterior al paso.<br>
+        </li>
+        <li>Existe la capacidad eterna de blufear en el paso (Al igual como en todo el juego).<br>
+        </li>
+        <li>Si una persona pasa, y la siguiente persona Duda, entonces se duda el paso y no la jugada anterior.</li>
+      </ul>
+      
+{% endblock %}

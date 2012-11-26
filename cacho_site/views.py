@@ -15,6 +15,10 @@ def index(request):
 	#return HttpResponse('this is index. welcome ' + request.user.username)
 	#return HttpResponseRedirect('/play/')
 
+def rules(request):
+	context = {"user": request.user}
+	return render(request, 'rules.html', context) 
+
 def logout_view(request):
 	logout(request)
 	HttpResponse("Logged out!")
