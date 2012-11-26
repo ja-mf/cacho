@@ -109,6 +109,9 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		self.emit_to_room(self.room, 'usuarios_room', redisutils.get_members_info(self.room))
 
 		self.disconnect(silent=True)
+		r = GameRoom.objects.get(id=self.room)	
+		r.state = False
+		r.save()
 
 		return True
 	
@@ -139,7 +142,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 
 		# tirar dados, turno y jugadas posibles
 		for sessid in redisutils.redisdb.smembers('room_' + self.room):
-			dados = [random.randint(1,6) for i in range(2)]
+			dados = [random.randint(1,6) for i in range(5)]
 			redisutils.redisdb.set('dados_' + sessid, json.dumps(dados))
 			self.totaldados[self.room] += 5
 			self.actualdados[self.room] += 5
@@ -169,6 +172,10 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 				self.emit_to_room(self.room, 'winner', self.username)
 				self.log(self.socket.sessid)
 				self.ganador[self.room]=1
+		r = GameRoom.objects.get(id=self.room)	
+		r.state = False
+		r.save()
+		
 					
 	
 	def on_get_jugadas_posibles(self):
@@ -219,8 +226,10 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 		# es calzo
 		if jugada == (0,0):
 			if (self.current_play[self.room][0] == nreal):
+				self.actualdados[self.room]+=1
 				n.append(0)
 			else:
+				self.actualdados[self.room]-=1
 				n.pop()
 			if (len(n)==0):
 				self.emit('player_lost')
@@ -278,6 +287,7 @@ class GameNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 					self.emit('turno', turno)	
 			self.current_play[self.room] = (0,6)
 			self.firstplay[self.room] = 1
+			self.actualdados[self.room]-=1
 
 		else:		# weas pa quitarle un dado al anterior
 			# enviar turno
