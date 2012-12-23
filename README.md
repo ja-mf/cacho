@@ -3,17 +3,17 @@ Instalacion
 
 Construir el ambiente:
 
-Dependencias: cython, python-2.7, redis
+Dependencias: redis, pip
 
 	$ git clone git@github.com:jamonardo/cacho.git
-	$ python bootstrap.py
-	$ ./bin/buildout
-	$ ./bin/django syncdb
+	$ cd cacho
+	$ source venv/bin/activate
+	(venv)$ pip install -r requirements.txt
 
 Iniciar demonio Redis
 
 	$ service redis-server start
 
-Ejecutar servidor:
+Ejecutar servidor (dentro de venv):
 
-	$ ./bin/django runserver_socketio
+	(venv)$ python manage.py runserver_socketio

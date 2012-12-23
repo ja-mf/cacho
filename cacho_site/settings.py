@@ -31,6 +31,9 @@ DATABASES = {
     }
 }
 
+# heroku
+#DATABASES['default'] = dj_database_url.config()
+
 SECRET_KEY = 'i_!&$f5@^%y*i_qa$*o&0$3q*1dcv^@_-l2po8-%_$_gwo+i-l'
 
 TEMPLATE_LOADERS = (

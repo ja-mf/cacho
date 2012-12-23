@@ -13,6 +13,9 @@ urlpatterns = patterns('',
 
 	# socket.io
    url("^socket\.io", include(socketio.sdjango.urls)),
+
+	(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT, 'show_indexes':True}),
+
 )
 
 urlpatterns += patterns('cacho_site.views', 

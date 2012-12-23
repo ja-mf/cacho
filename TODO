@@ -1,0 +1,4 @@
+- Cuando alguien gana el juego se demora en salirse.
+- Cambiar codigo de cacho_socketio.py, para que el contexto no dependa de las variables estaticas.
+Esto es para ejecutar varios procesos (workers) para un solo servidor.
+- Cambiar el servidor para que use wsgi.py, gunicorn.
