@@ -3,10 +3,11 @@ Instalacion
 
 Construir el ambiente:
 
-Dependencias: redis, pip
+Dependencias: redis, pip, virtualenv
 
 	$ git clone git@github.com:jamonardo/cacho.git
 	$ cd cacho
+	$ virtualenv venv --distribute
 	$ source venv/bin/activate
 	(venv)$ pip install -r requirements.txt
 
